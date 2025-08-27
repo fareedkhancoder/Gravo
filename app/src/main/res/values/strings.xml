@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Gravo</string>
+    <string name="default_web_client_id">488523270574-8mb2shqk2o7fjhjls8at9h5udi3jl0sf.apps.googleusercontent.com</string>
+    <color name="buy_now_green">#4CAF50</color>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="full_name_required">Full Name (Required)</string>
+    <string name="phone_number_required">Phone Number (Required)</string>
+    <string name="pincode_required">Pincode (Required)</string>
+    <string name="state_required">State (Required)</string>
+    <string name="city_required">City (Required)</string>
+    <string name="house_no_building_name_required">House No., Building Name (Required)</string>
+    <string name="type_of_address">Type of address</string>
+    <string name="home">Home</string>
+    <string name="work">Work</string>
+    <string name="make_this_my_default_address">Make this my default address</string>
+    <string name="save_address">Save Address</string>
+
+</resources>

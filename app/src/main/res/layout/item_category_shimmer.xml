@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="80dp"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <!--
+    This uses a CardView with a large corner radius to create a circle.
+    This is a common and easy way to create circular shapes in XML.
+    -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="0dp">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/placeholder_bg" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Placeholder for the category text label -->
+    <View
+        android:layout_width="50dp"
+        android:layout_height="16dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/placeholder_bg" />
+
+</LinearLayout>
