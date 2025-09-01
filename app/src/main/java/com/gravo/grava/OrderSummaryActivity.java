@@ -229,7 +229,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private void calculateAndDisplayPriceDetails() {
         mrp = 0.0;
         for (CartItem item : summaryItems) {
-            mrp += item.getProduct().price * item.getQuantity();
+            mrp += item.getProduct().getPrice() * item.getQuantity();
         }
         discount = mrp * 0.10; // Example: 10% discount
         deliveryFee = (mrp - discount > 500) ? 0.0 : 40.0; // Example: Free delivery on orders over 500

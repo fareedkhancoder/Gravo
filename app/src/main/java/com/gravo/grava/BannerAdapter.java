@@ -1,14 +1,18 @@
 // BannerAdapter.java
 package com.gravo.grava;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
@@ -28,17 +32,33 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        // Infinite loop ke liye
+        // 1. CRASH PREVENTION: Check if the list is empty before proceeding.
+        if (productList == null || productList.isEmpty()) {
+            return;
+        }
+
+        // 2. INFINITE SCROLL: Calculate the actual position.
         int actualPosition = position % productList.size();
         Product product = productList.get(actualPosition);
 
-        holder.productNameTextView.setText(product.name);
-        holder.productPriceTextView.setText("From ₹" + String.format("%.0f", product.price));
+        // Get context once for reuse.
+        Context context = holder.itemView.getContext();
 
-        if (product.imageUrls != null && !product.imageUrls.isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(product.imageUrls.get(0))
+        // 3. USE GETTERS: Access data using public getter methods.
+        holder.productNameTextView.setText(product.getName());
+
+        // 4. USE STRING RESOURCES: Set the price using the resource from strings.xml.
+        String formattedPrice = context.getString(R.string.price_format_from, product.getPrice());
+        holder.productPriceTextView.setText(formattedPrice);
+
+        // 5. USE GETTERS for image URLs.
+        if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+            Glide.with(context)
+                    .load(product.getImageUrls().get(0))
                     .into(holder.bannerImageView);
+        } else {
+            // Optional: Set a placeholder image if no images are available.
+            holder.bannerImageView.setImageResource(R.drawable.ic_placeholder); // Example placeholder
         }
     }
 

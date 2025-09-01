@@ -1,55 +1,101 @@
 package com.gravo.grava;
 
-import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Product implements Serializable {
 
-    @Exclude
-    public String productId;
+    @DocumentId // Automatically maps the document ID from Firestore.
+    private String productId;
 
-    public String name;
-    public String description;
-    public double price;
-    public String brand;
-    public int stockQuantity;
-    public List<String> imageUrls; // storing URLs
-    public String categoryId;
+    private String name;
+    private String description;
+    private double price;
+    private String brand;
+    private int stockQuantity;
+    private List<String> imageUrls;
+    private String categoryId;
 
-    public Product() {
-        // Needed for Firestore
-    }
+    // --- Fields from previous warnings ---
+    private double discountPercent;
+    private double costPrice;
+    private String sellerId;
+    private Map<String, String> specifications; // Assuming it's a map of key-value pairs
+    private Date createdAt;
 
-    public Product(String name, String description, double price, String brand,
-                   int stockQuantity, List<String> imageUrls, String categoryId) {
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.brand = brand;
-        this.stockQuantity = stockQuantity;
-        this.imageUrls = imageUrls;
-        this.categoryId = categoryId;
-    }
+    @PropertyName("is_new")
+    private boolean isNew;
 
-    public String getProductId() {
-        return productId;
-    }
+    @PropertyName("tags_lowercase")
+    private List<String> tagsLowercase;
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
+    // A no-argument constructor is required for Firestore.
+    public Product() {}
 
-    // ✅ Fixed getter
-    public List<String> getImageUrl() {
-        return imageUrls;
-    }
+    // --- Getters and Setters for all fields ---
 
-    // Optional: First image only
-    public String getFirstImageUrl() {
-        if (imageUrls != null && !imageUrls.isEmpty()) {
-            return imageUrls.get(0);
-        }
-        return null;
+    public String getProductId() { return productId; }
+    public void setProductId(String productId) { this.productId = productId; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+
+    public List<String> getImageUrls() { return imageUrls; } // Corrected method name
+    public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
+
+    public String getCategoryId() { return categoryId; }
+    public void setCategoryId(String categoryId) { this.categoryId = categoryId; }
+
+    public double getDiscountPercent() { return discountPercent; }
+    public void setDiscountPercent(double discountPercent) { this.discountPercent = discountPercent; }
+
+    public double getCostPrice() { return costPrice; }
+    public void setCostPrice(double costPrice) { this.costPrice = costPrice; }
+
+    public String getSellerId() { return sellerId; }
+    public void setSellerId(String sellerId) { this.sellerId = sellerId; }
+
+    public Map<String, String> getSpecifications() { return specifications; }
+    public void setSpecifications(Map<String, String> specifications) { this.specifications = specifications; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    @PropertyName("is_new") // Links the isNew field to "is_new" in Firestore
+    public boolean isNew() { return isNew; }
+
+    @PropertyName("is_new")
+    public void setNew(boolean aNew) { isNew = aNew; }
+
+    @PropertyName("tags_lowercase") // Links tagsLowercase to "tags_lowercase" in Firestore
+    public List<String> getTagsLowercase() { return tagsLowercase; }
+
+    @PropertyName("tags_lowercase")
+    public void setTagsLowercase(List<String> tagsLowercase) { this.tagsLowercase = tagsLowercase; }
+
+    // Provides a readable string for easy debugging.
+    @Override
+    public String toString() {
+        return "Product{" +
+                "productId='" + productId + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                '}';
     }
 }

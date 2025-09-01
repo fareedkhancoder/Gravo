@@ -1,6 +1,10 @@
 package com.gravo.grava;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -9,9 +13,10 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +59,14 @@ public class HomeActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_account) {
                 replaceFragment(new AccountFragment());
                 return true;
+            } else if (itemId == R.id.nav_categories) {
+                replaceFragment(new CategoriesFragment());
             }
             return false;
         });
     }
+
+
 
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -65,6 +74,23 @@ public class HomeActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         // It's good practice not to add the first fragment to the back stack.
         // fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    // Add this method inside your HomeActivity.java file
+
+    @Override
+    public void navigateToCategories(String categoryId) {
+
+        // 2. Use the newInstance factory method to create the fragment with the ID
+        Fragment categoriesFragment = CategoriesFragment.newInstance(categoryId);
+        Log.d(TAG, "navigateToCategories: received categoryId" + categoryId);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        fragmentTransaction.replace(R.id.fragment_container, categoriesFragment);
+        fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 }

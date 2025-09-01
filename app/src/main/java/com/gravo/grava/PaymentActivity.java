@@ -107,10 +107,10 @@ public class PaymentActivity extends AppCompatActivity {
 
             Map<String, Object> orderItemMap = new HashMap<>();
             orderItemMap.put("productId", item.getProduct().getProductId());
-            orderItemMap.put("name", item.getProduct().name);
-            orderItemMap.put("priceAtPurchase", item.getProduct().price);
+            orderItemMap.put("name", item.getProduct().getCategoryId());
+            orderItemMap.put("priceAtPurchase", item.getProduct().getPrice());
             orderItemMap.put("quantity", item.getQuantity());
-            orderItemMap.put("imageUrl", item.getProduct().getImageUrl()); // Add this line
+            orderItemMap.put("imageUrl", item.getProduct().getImageUrls()); // Add this line
             orderItemsList.add(orderItemMap);
         }
         orderData.put("items", orderItemsList);

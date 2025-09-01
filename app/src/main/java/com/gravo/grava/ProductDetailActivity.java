@@ -114,13 +114,13 @@ public class ProductDetailActivity extends AppCompatActivity {
                         Log.i(TAG, "SUCCESS: Document exists!");
                         Product product = documentSnapshot.toObject(Product.class);
                         if (product != null) {
-                            Log.d(TAG, "Product Name from Firestore: " + product.name);
-                            productNameTextView.setText(product.name);
-                            productPriceTextView.setText("₹" + String.format("%.2f", product.price));
-                            productDescriptionTextView.setText(product.description);
+                            Log.d(TAG, "Product Name from Firestore: " + product.getName());
+                            productNameTextView.setText(product.getName());
+                            productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
+                            productDescriptionTextView.setText(product.getDescription());
 
-                            if (product.imageUrls != null && !product.imageUrls.isEmpty()) {
-                                Glide.with(this).load(product.imageUrls.get(0)).into(productImageView);
+                            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+                                Glide.with(this).load(product.getImageUrls().get(0)).into(productImageView);
                             }
                         }else{
                             Log.e(TAG, "ERROR: Product object is null. Check if field names in your Product.java class and Firestore document match.");

@@ -1,6 +1,6 @@
 package com.gravo.grava;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,16 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,10 +26,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements ProductAdapter.OnProductClickListener {
+public class HomeFragment extends Fragment implements ProductAdapter.OnProductClickListener, CategoryAdapter.OnCategoryItemClickListener {
+
+    // 1. Interface for communication with the host activity
+    public interface OnHomeFragmentInteractionListener {
+        void navigateToCategories(String categoryId);
+    }
+    private OnHomeFragmentInteractionListener mListener;
 
     private static final String TAG = "HomeFragment";
     private FirebaseFirestore db;
@@ -49,7 +52,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private CategoryAdapter categoryAdapter;
     private ProductAdapter dealsAdapter;
     private ProductAdapter trendingAdapter;
-    private BannerAdapter bannerAdapter;;
+    private BannerAdapter bannerAdapter; // CORRECTED: Removed extra semicolon
 
     // Data Lists
     private List<Category> categoryList;
@@ -57,18 +60,34 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private List<Product> trendingList;
     private List<Product> bannerProductList;
 
-    // Auto-slide ke liye Handler
+    // Auto-slide Handler
     private final Handler sliderHandler = new Handler();
     private Runnable sliderRunnable;
 
     private ActivityResultLauncher<Intent> addressLauncher;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof OnHomeFragmentInteractionListener) {
+            mListener = (OnHomeFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnHomeFragmentInteractionListener");
+        }
+    }
+
+    // ADDED: Best practice to nullify listener on detach
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-
-        return root;
+        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
@@ -77,6 +96,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         Log.d(TAG, "FlowTracker: onViewCreated -> Fragment view is created.");
 
         db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         // Initialize all data lists
         categoryList = new ArrayList<>();
@@ -84,56 +104,55 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         trendingList = new ArrayList<>();
         bannerProductList = new ArrayList<>();
 
-        View searchBarCard = view.findViewById(R.id.search);
-        ImageView searchIcon = view.findViewById(R.id.search_icon);
-        shimmertrending = view.findViewById(R.id.trendingShimmerLayout);
-        shimmerdeals = view.findViewById(R.id.dealsShimmerLayout);
-        shimmerbanner = view.findViewById(R.id.slideshow);
-        shimmerCategory = view.findViewById(R.id.shimmer_ct);
-        address = view.findViewById(R.id.address);
-        mAuth = FirebaseAuth.getInstance();
-        addressLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        String selectedAddressId = result.getData().getStringExtra("SELECTED_ADDRESS_ID");
-                        if (selectedAddressId != null) {
-                            // ✅ Refresh address text
-                            fetchDefaultAddress();
-                        }
-                    } else {
-                        // refresh anyway in case something changed
-                        fetchDefaultAddress();
-                    }
-                }
-        );
-
-        address.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MyAddressesActivity.class);
-            intent.putExtra("DEFAULT_SETTER_MODE", true); // or SELECT_ADDRESS_MODE
-            addressLauncher.launch(intent);
-        });
-        searchBarCard.setOnClickListener(v -> {
-            if (getActivity() != null) {
-                startActivity(new Intent(getActivity(), SearchActivity.class));
-            }
-        });
-        searchIcon.setOnClickListener(v -> {
-            DataSeeder seeder = new DataSeeder();
-            seeder.addLowercaseTagsFromName();
-
-        });
-
+        // Initialize UI Components
+        initializeViews(view);
+        setupClickListeners();
 
         // Setup all UI components and their adapters
-        Log.d(TAG, "FlowTracker: onViewCreated -> Setting up UI components.");
         setupCategoriesRecyclerView(view);
         setupDealsRecyclerView(view);
         setupTrendingRecyclerView(view);
         setupBannerViewPager(view);
 
         // Fetch all data from Firestore
-        Log.d(TAG, "FlowTracker: onViewCreated -> Starting to fetch all data.");
+        fetchAllData();
+    }
+
+    private void initializeViews(@NonNull View view) {
+        shimmertrending = view.findViewById(R.id.trendingShimmerLayout);
+        shimmerdeals = view.findViewById(R.id.dealsShimmerLayout);
+        shimmerbanner = view.findViewById(R.id.slideshow);
+        shimmerCategory = view.findViewById(R.id.shimmer_ct);
+        address = view.findViewById(R.id.address);
+    }
+
+    private void setupClickListeners() {
+        // Address click listener
+        addressLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    // Refresh address text regardless of result
+                    fetchDefaultAddress();
+                }
+        );
+        address.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MyAddressesActivity.class);
+            intent.putExtra("DEFAULT_SETTER_MODE", true);
+            addressLauncher.launch(intent);
+        });
+
+        // Search bar click listener (assuming R.id.search is the container)
+        View searchBarCard = getView().findViewById(R.id.search);
+        if (searchBarCard != null) {
+            searchBarCard.setOnClickListener(v -> {
+                if (getActivity() != null) {
+                    startActivity(new Intent(getActivity(), SearchActivity.class));
+                }
+            });
+        }
+    }
+
+    private void fetchAllData() {
         fetchCategories();
         fetchBannerProducts();
         fetchDeals();
@@ -141,45 +160,12 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         fetchDefaultAddress();
     }
 
-
-    private void fetchDefaultAddress() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            Log.w(TAG, "Cannot fetch address: user not logged in.");
-            address.setText("No user logged in.");
-            return;
-        }
-        String userId = currentUser.getUid();
-
-        db.collection("users").document(userId).collection("addresses")
-                .whereEqualTo("default", true) // Query for the default address
-                .limit(1) // We only expect one default address
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        if (task.getResult().isEmpty()) {
-                            Log.d(TAG, "No default address found for user: " + userId);
-                            address.setText("No default address set.");
-                        } else {
-                            // Get the first document, as we limited the query to 1
-                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) task.getResult().getDocuments().get(0);
-                            Address defaultAddress = document.toObject(Address.class);
-                            address.setText("Delive To: " + defaultAddress.toString());
-                            Log.d(TAG, "Default address fetched: " + defaultAddress.toString());
-                        }
-                    } else {
-                        Log.e(TAG, "Error fetching default address", task.getException());
-                        address.setText("Could not load address.");
-                    }
-                });
-    }
-
     // --- UI Setup Methods ---
 
     private void setupCategoriesRecyclerView(View view) {
         categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
         categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        categoryAdapter = new CategoryAdapter(getContext(), categoryList);
+        categoryAdapter = new CategoryAdapter(getContext(), categoryList, this);
         categoriesRecyclerView.setAdapter(categoryAdapter);
     }
 
@@ -202,10 +188,6 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         bannerAdapter = new BannerAdapter(bannerProductList);
         bannerViewPager.setAdapter(bannerAdapter);
 
-        if (bannerProductList != null && !bannerProductList.isEmpty()) {
-            bannerViewPager.setCurrentItem(Integer.MAX_VALUE / 2, false);
-        }
-
         sliderRunnable = () -> {
             if (bannerViewPager != null) {
                 bannerViewPager.setCurrentItem(bannerViewPager.getCurrentItem() + 1);
@@ -227,11 +209,13 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private void fetchCategories() {
         db.collection("categories").get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && getContext() != null) {
+                // CORRECTED: Stop shimmer outside the loop to handle empty results
+                shimmerCategory.stopShimmer();
+                shimmerCategory.setVisibility(View.GONE);
+                categoriesRecyclerView.setVisibility(View.VISIBLE);
+
                 categoryList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
-                    shimmerCategory.stopShimmer();
-                    shimmerCategory.setVisibility(View.GONE);
-                    categoriesRecyclerView.setVisibility(View.VISIBLE);
                     categoryList.add(document.toObject(Category.class));
                 }
                 if (categoryAdapter != null) categoryAdapter.notifyDataSetChanged();
@@ -242,13 +226,15 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private void fetchBannerProducts() {
         db.collection("products").orderBy("stockQuantity", Query.Direction.ASCENDING).limit(4).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && getContext() != null) {
+                // CORRECTED: Stop shimmer outside the loop
+                shimmerbanner.stopShimmer();
+                shimmerbanner.setVisibility(View.GONE);
+                bannerViewPager.setVisibility(View.VISIBLE);
+
                 bannerProductList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Product product = document.toObject(Product.class);
                     product.setProductId(document.getId());
-                    shimmerbanner.stopShimmer();
-                    shimmerbanner.setVisibility(View.GONE);
-                    bannerViewPager.setVisibility(View.VISIBLE);
                     bannerProductList.add(product);
                 }
                 if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
@@ -259,13 +245,15 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private void fetchDeals() {
         db.collection("products").limit(5).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && getContext() != null) {
+                // CORRECTED: Stop shimmer outside the loop
+                shimmerdeals.stopShimmer();
+                shimmerdeals.setVisibility(View.GONE);
+                dealsRecyclerView.setVisibility(View.VISIBLE);
+
                 dealsList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Product product = document.toObject(Product.class);
                     product.setProductId(document.getId());
-                    shimmerdeals.stopShimmer();
-                    shimmerdeals.setVisibility(View.GONE);
-                    dealsRecyclerView.setVisibility(View.VISIBLE);
                     dealsList.add(product);
                 }
                 if (dealsAdapter != null) dealsAdapter.notifyDataSetChanged();
@@ -276,18 +264,47 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private void fetchTrendingProducts() {
         db.collection("products").orderBy("stockQuantity", Query.Direction.DESCENDING).limit(6).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && getContext() != null) {
+                // CORRECTED: Stop shimmer outside the loop
+                shimmertrending.stopShimmer();
+                shimmertrending.setVisibility(View.GONE);
+                trendingRecyclerView.setVisibility(View.VISIBLE);
+
                 trendingList.clear();
                 for (QueryDocumentSnapshot document : task.getResult()) {
                     Product product = document.toObject(Product.class);
                     product.setProductId(document.getId());
-                    shimmertrending.stopShimmer();
-                    shimmertrending.setVisibility(View.GONE);
-                    trendingRecyclerView.setVisibility(View.VISIBLE);
                     trendingList.add(product);
                 }
                 if (trendingAdapter != null) trendingAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void fetchDefaultAddress() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            address.setText("No user logged in.");
+            return;
+        }
+        String userId = currentUser.getUid();
+        db.collection("users").document(userId).collection("addresses")
+                .whereEqualTo("default", true)
+                .limit(1)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        if (task.getResult().isEmpty()) {
+                            address.setText("No default address set.");
+                        } else {
+                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) task.getResult().getDocuments().get(0);
+                            Address defaultAddress = document.toObject(Address.class);
+                            address.setText("Deliver To: " + defaultAddress.toString());
+                        }
+                    } else {
+                        Log.e(TAG, "Error fetching default address", task.getException());
+                        address.setText("Could not load address.");
+                    }
+                });
     }
 
     // --- Click Listener Implementation ---
@@ -297,6 +314,14 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         Intent intent = new Intent(getContext(), ProductDetailActivity.class);
         intent.putExtra("PRODUCT_ID", product.getProductId());
         startActivity(intent);
+    }
+
+    @Override
+    public void onCategoryItemClick(Category category) {
+        if (mListener != null) {
+            mListener.navigateToCategories(category.getId());
+            Log.d(TAG, "onCategoryItemClick: sending category id" + category.getId());
+        }
     }
 
     // --- Lifecycle and Runnable for Banner ---
@@ -309,6 +334,9 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     @Override
     public void onResume() {
         super.onResume();
-        sliderHandler.postDelayed(sliderRunnable, 3000);
+        // Start slider only if there are items
+        if(bannerProductList != null && !bannerProductList.isEmpty()){
+            sliderHandler.postDelayed(sliderRunnable, 3000);
+        }
     }
 }

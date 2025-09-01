@@ -15,5 +15,8 @@
     <string name="work">Work</string>
     <string name="make_this_my_default_address">Make this my default address</string>
     <string name="save_address">Save Address</string>
+    <string name="price_format_from">From ₹%.0f</string>
+    <string name="price_format">₹%.2f</string>
+    <string name="quantity_format">Qty: %d</string>
 
 </resources>

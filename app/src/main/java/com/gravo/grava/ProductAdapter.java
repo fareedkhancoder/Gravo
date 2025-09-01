@@ -42,12 +42,12 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
-        holder.productNameTextView.setText(product.name);
-        holder.productPriceTextView.setText("₹" + String.format("%.2f", product.price));
+        holder.productNameTextView.setText(product.getName());
+        holder.productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
 
-        if (product.imageUrls != null && !product.imageUrls.isEmpty()) {
+        if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
             Glide.with(context)
-                    .load(product.imageUrls.get(0))
+                    .load(product.getImageUrls().get(0))
                     .into(holder.productImageView);
         }
         holder.itemView.setOnClickListener(v -> {

@@ -31,23 +31,36 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        // Current item ka data prapt karein
+        // Get the data for the current item
         CartItem cartItem = cartItemList.get(position);
         Product product = cartItem.getProduct();
 
-        if (product != null) {
-            // UI par data set karein
-            holder.productNameTextView.setText(product.name);
-            holder.productPriceTextView.setText("₹" + String.format("%.2f", product.price));
+        // Get context once for reuse
+        Context context = holder.itemView.getContext();
 
-            // Glide ka istemal karke image load karein
-            if (product.imageUrls != null && !product.imageUrls.isEmpty()) {
+        // Set the product data on the UI, if the product is not null
+        if (product != null) {
+            // Use the public getter for the product name
+            holder.productNameTextView.setText(product.getName());
+
+            // Use a string resource to format and set the price
+            String formattedPrice = context.getString(R.string.price_format, product.getPrice());
+            holder.productPriceTextView.setText(formattedPrice);
+
+            // Use the public getter to load the image with Glide
+            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
                 Glide.with(context)
-                        .load(product.imageUrls.get(0))
+                        .load(product.getImageUrls().get(0))
                         .into(holder.productImageView);
+            } else {
+                // Set a placeholder if the product has no image
+                holder.productImageView.setImageResource(R.drawable.ic_placeholder); // Example placeholder
             }
         }
-        // Aap yahan quantity (cartItem.getQuantity()) bhi dikha sakte hain
+
+        // Display the quantity of the item in the cart
+        String formattedQuantity = context.getString(R.string.quantity_format, cartItem.getQuantity());
+        //holder.quantityTextView.setText(formattedQuantity); // Assuming you have a quantityTextView
     }
 
     @Override

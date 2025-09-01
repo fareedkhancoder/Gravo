@@ -16,10 +16,19 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private Context context;
     private List<Category> categoryList;
+    // 1. Declare the listener variable
+    private OnCategoryItemClickListener mListener;
 
-    public CategoryAdapter(Context context, List<Category> categoryList) {
+    // 2. Define the click listener interface
+    public interface OnCategoryItemClickListener {
+        void onCategoryItemClick(Category category);
+    }
+
+    // 3. Update the constructor to accept the listener
+    public CategoryAdapter(Context context, List<Category> categoryList, OnCategoryItemClickListener listener) {
         this.context = context;
         this.categoryList = categoryList;
+        this.mListener = listener; // Assign the listener
     }
 
     @NonNull
@@ -34,10 +43,17 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         Category category = categoryList.get(position);
         holder.categoryNameTextView.setText(category.getName());
 
-        // Use Glide to load the icon from a URL
         Glide.with(context)
-                .load(category.getIconUrl())
+                .load(category.getIconUrl()) // Assuming getIconUrl() is correct
                 .into(holder.categoryImageView);
+
+        // 4. Set the click listener on the entire item view
+        holder.itemView.setOnClickListener(v -> {
+            if (mListener != null) {
+                // Pass the clicked category object back to the fragment
+                mListener.onCategoryItemClick(category);
+            }
+        });
     }
 
     @Override
@@ -51,6 +67,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Make sure these IDs match your R.layout.item_category XML file
             categoryImageView = itemView.findViewById(R.id.categoryImageView);
             categoryNameTextView = itemView.findViewById(R.id.categoryNameTextView);
         }

@@ -34,13 +34,13 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
         Product product = cartItem.getProduct();
 
         if (product != null) {
-            holder.productNameTextView.setText(product.name);
-            holder.productPriceTextView.setText("₹" + String.format("%.2f", product.price));
+            holder.productNameTextView.setText(product.getName());
+            holder.productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
             holder.quantityTextView.setText("Qty: " + cartItem.getQuantity()); // Quantity set karein
 
-            if (product.imageUrls != null && !product.imageUrls.isEmpty()) {
+            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
                 Glide.with(context)
-                        .load(product.imageUrls.get(0))
+                        .load(product.getImageUrls().get(0))
                         .into(holder.productImageView);
             }
         }

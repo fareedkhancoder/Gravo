@@ -120,7 +120,7 @@ public class CartFragment extends Fragment {
 
                                             cartItemList.add(new CartItem(product, quantity));
 
-                                            totalPrice += product.price * quantity;
+                                            totalPrice += product.getPrice() * quantity;
                                             updateTotalPrice();
 
                                             if(cartAdapter != null) cartAdapter.notifyDataSetChanged();
