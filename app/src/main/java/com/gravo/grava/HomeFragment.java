@@ -320,7 +320,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     public void onCategoryItemClick(Category category) {
         if (mListener != null) {
             mListener.navigateToCategories(category.getId());
-            Log.d(TAG, "onCategoryItemClick: sending category id" + category.getId());
+            Log.d(TAG, "Home Fragment: sending category id to Home Activity" + category.getId());
         }
     }
 

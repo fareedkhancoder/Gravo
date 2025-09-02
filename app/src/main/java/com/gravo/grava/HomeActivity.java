@@ -31,12 +31,20 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
             return insets;
         });
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
-
         if (savedInstanceState == null) {
             replaceFragment(new HomeFragment());
         }
 
+        // Set up the listener for user taps
+        setupBottomNavigationListener();
+    }
+
+    /**
+     * Sets up the listener for the BottomNavigationView.
+     * This logic is in its own method so it can be re-applied after being temporarily removed.
+     */
+    private void setupBottomNavigationListener() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
@@ -49,6 +57,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
                 replaceFragment(new AccountFragment());
                 return true;
             } else if (itemId == R.id.nav_categories) {
+                // This now only triggers for a direct user tap on the categories icon
                 replaceFragment(new CategoriesFragment());
                 return true;
             }
@@ -56,32 +65,34 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
         });
     }
 
-
-
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
-        // It's good practice not to add the first fragment to the back stack.
-        // fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
+
     @Override
     public void navigateToCategories(String categoryId) {
-        // 1. Create the fragment instance
+        // 1. Create the fragment instance with its arguments
         Fragment categoriesFragment = CategoriesFragment.newInstance(categoryId);
-        Log.d(TAG, "navigateToCategories: received categoryId: " + categoryId);
+        Log.d(TAG, "Home Activity: received categoryId from HomeFragment: " + categoryId + "Sending it to CategoriesFragment");
 
         // 2. Perform the fragment transaction
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
         fragmentTransaction.replace(R.id.fragment_container, categoriesFragment);
-        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.addToBackStack(null); // Correct to add to back stack for this navigation
         fragmentTransaction.commit();
 
         // 3. ✨ FIX: Manually update the BottomNavigationView's selected item
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+        // Temporarily disable the listener to prevent it from creating a second fragment.
+        bottomNavigationView.setOnItemSelectedListener(null);
+        // Update the UI to show the correct tab as selected.
         bottomNavigationView.setSelectedItemId(R.id.nav_categories);
+        // Re-attach the listener so it works for manual user taps again.
+        setupBottomNavigationListener();
     }
 }
