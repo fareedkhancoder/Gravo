@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_item_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:paddingTop="12dp"
-    android:paddingBottom="12dp">
+    android:gravity="center"
+    android:paddingVertical="16dp"
+    android:paddingHorizontal="4dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/iv_category_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="centerCrop"
-        tools:src="@tools:sample/avatars" />
+        android:id="@+id/categoryImageView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        tools:src="@drawable/ic_launcher_background" />
 
     <TextView
-        android:id="@+id/tv_category_name"
+        android:id="@+id/categoryNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:textSize="12sp"
         android:gravity="center"
-        tools:text="Grocery" />
+        android:textSize="12sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        tools:text="Electronics" />
 
 </LinearLayout>

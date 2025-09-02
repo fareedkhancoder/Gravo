@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green">#00FF00</color>
     <color name="placeholder_bg">#DDDDDD</color>
+    <color name="purple_500">#FF6200EE</color>
 
 
 </resources>
