@@ -336,7 +336,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         super.onResume();
         // Start slider only if there are items
         if(bannerProductList != null && !bannerProductList.isEmpty()){
-            sliderHandler.postDelayed(sliderRunnable, 3000);
+            sliderHandler.postDelayed(sliderRunnable, 5000);
         }
     }
 }
