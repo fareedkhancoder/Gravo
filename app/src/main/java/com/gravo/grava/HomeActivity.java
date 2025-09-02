@@ -33,17 +33,6 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
 
-        // --- Best Practice Improvement ---
-        // The inefficient `fetchAndStoreAllTags` method has been removed.
-        // Pre-loading all product tags on app start is not scalable and leads to poor performance.
-        // Search suggestion data should be fetched on-demand from the search screen
-        // or from a dedicated, aggregated document in Firestore, not by querying the entire collection.
-
-        // TODO: Implement Google Play In-App Updates.
-        // It's a good practice to check for flexible updates here.
-        // This allows the user to continue using the app while the update downloads.
-        // checkForAppUpdate();
-
         if (savedInstanceState == null) {
             replaceFragment(new HomeFragment());
         }
@@ -61,6 +50,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
                 return true;
             } else if (itemId == R.id.nav_categories) {
                 replaceFragment(new CategoriesFragment());
+                return true;
             }
             return false;
         });
@@ -76,21 +66,22 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
         // fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
-
-    // Add this method inside your HomeActivity.java file
-
     @Override
     public void navigateToCategories(String categoryId) {
-
-        // 2. Use the newInstance factory method to create the fragment with the ID
+        // 1. Create the fragment instance
         Fragment categoriesFragment = CategoriesFragment.newInstance(categoryId);
-        Log.d(TAG, "navigateToCategories: received categoryId" + categoryId);
+        Log.d(TAG, "navigateToCategories: received categoryId: " + categoryId);
 
+        // 2. Perform the fragment transaction
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         fragmentTransaction.replace(R.id.fragment_container, categoriesFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+
+        // 3. ✨ FIX: Manually update the BottomNavigationView's selected item
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.nav_categories);
     }
 }
