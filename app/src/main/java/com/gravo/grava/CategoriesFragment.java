@@ -2,6 +2,7 @@ package com.gravo.grava;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -181,10 +182,14 @@ public class CategoriesFragment extends Fragment implements ProductAdapter.OnPro
     public void onCategorySideClick(int position) {
         // Update the adapter to highlight the new selection
         categorySideAdapter.setSelectedPosition(position);
+        Log.d(TAG, "onCategorySideClick: position" + position);
         this.selectedCategoryPosition = position; // Keep the fragment's state in sync
+
+        Log.d(TAG, "onCategorySideClick: " + selectedCategoryPosition);
 
         // Get the ID of the newly clicked category
         Category selectedCategory = categoryList.get(position);
+        Log.d(TAG, "onCategorySideClick: " + selectedCategory.getId());
 
         // Fetch products for this new category
         fetchProductsForCategory(selectedCategory.getId());
@@ -196,9 +201,9 @@ public class CategoriesFragment extends Fragment implements ProductAdapter.OnPro
      */
     @Override
     public void onProductClick(Product product) {
-        // TODO: Implement navigation to a Product Detail Fragment/Activity
-        // For now, we can just show a Toast message for testing.
-        Toast.makeText(getContext(), "Clicked on: " + product.getName(), Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "Product clicked: " + product.toString());
+        if (getContext() == null) return;
+        Intent intent = new Intent(getContext(), ProductDetailActivity.class);
+        intent.putExtra("PRODUCT_ID", product.getProductId());
+        startActivity(intent);
     }
 }

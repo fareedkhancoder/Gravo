@@ -21,7 +21,7 @@ public class CategorySideAdapter extends RecyclerView.Adapter<CategorySideAdapte
     private final Context context;
     private final List<Category> categoryList;
     private final OnCategorySideClickListener mListener;
-    private int selectedPosition = 0; // To keep track of the selected item
+    private int selectedPosition = 0;
 
     // Click listener interface
     public interface OnCategorySideClickListener {
@@ -34,9 +34,23 @@ public class CategorySideAdapter extends RecyclerView.Adapter<CategorySideAdapte
         this.mListener = listener;
     }
 
-    // Method to update the selected position from the fragment
+    /**
+     * Updates the selected position and notifies the adapter to redraw the affected items.
+     * This is the crucial step to make the visual selection update.
+     * @param position The new position that should be selected.
+     */
     public void setSelectedPosition(int position) {
-        this.selectedPosition = position;
+        if (selectedPosition == position) {
+            return; // No change needed if the same item is clicked
+        }
+
+        int previousPosition = selectedPosition;
+        selectedPosition = position;
+
+        // Notify the adapter that the old item needs to be redrawn (to remove highlight)
+        notifyItemChanged(previousPosition);
+        // Notify the adapter that the new item needs to be redrawn (to add highlight)
+        notifyItemChanged(position);
     }
 
     @NonNull
@@ -55,13 +69,12 @@ public class CategorySideAdapter extends RecyclerView.Adapter<CategorySideAdapte
                 .load(category.getIconUrl())
                 .into(holder.categoryImageView);
 
-        // *** VISUAL SELECTION LOGIC ***
-        // Change background color based on whether the item is selected or not
+        // Visual selection logic based on the updated 'selectedPosition'
         if (selectedPosition == position) {
-            holder.itemView.setBackgroundColor(Color.WHITE); // Or any other highlight color
-            holder.categoryNameTextView.setTextColor(ContextCompat.getColor(context, R.color.purple_500)); // Example highlight text color
+            holder.itemView.setBackgroundColor(Color.WHITE);
+            holder.categoryNameTextView.setTextColor(ContextCompat.getColor(context, R.color.purple_500));
         } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT); // Default background
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
             holder.categoryNameTextView.setTextColor(Color.BLACK);
         }
 
