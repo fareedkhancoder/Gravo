@@ -20,15 +20,31 @@
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/ic_arrow_back">
 
-            <EditText
-                android:id="@+id/searchEditText"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/searchBarCard"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="Search for Products..."
-                android:background="@android:color/transparent"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1"/>
+                android:layout_height="wrap_content"
+                android:paddingVertical="8dp"
+                app:cardCornerRadius="20dp"
+                app:cardBackgroundColor="@color/white"
+                android:background="@color/white"
+                android:layout_marginEnd="10dp"
+                app:cardElevation="2dp">
+
+                <EditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:hint="Search for Products, Brands and More"
+                    android:textSize="14sp"
+                    android:imeOptions="actionSearch"
+                    android:background="@color/white"
+                    android:inputType="text"
+                    android:paddingHorizontal="10dp"
+                    android:maxLines="1"/>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>

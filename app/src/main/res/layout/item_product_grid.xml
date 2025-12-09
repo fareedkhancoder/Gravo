@@ -9,47 +9,115 @@
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="260dp"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/productImageView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:scaleType="centerCrop"
-            app:layout_constraintDimensionRatio="1:1"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:src="@tools:sample/avatars" />
+            tools:src="@tools:sample/backgrounds/scenic" />
 
-        <TextView
-            android:id="@+id/productNameTextView"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="Product Name"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:maxLines="2"
-            android:ellipsize="end"
-            app:layout_constraintTop_toBottomOf="@id/productImageView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:orientation="vertical"
+            android:padding="8dp">
 
-        <TextView
-            android:id="@+id/productPriceTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:text="₹499"
-            android:textAppearance="?attr/textAppearanceSubtitle2"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"
-            app:layout_constraintTop_toBottomOf="@id/productNameTextView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            <TextView
+                android:id="@+id/productNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Product Name"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/productPriceTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="₹1,299"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
+        </LinearLayout>
+
+        <!-- This FrameLayout allows us to stack the Add button and quantity selector -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="8dp"
+            android:paddingBottom="8dp">
+
+            <!-- The "Add" button, visible by default -->
+            <TextView
+                android:id="@+id/addButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Add"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:background="@drawable/background_of_category_item"
+                android:visibility="visible"
+                app:cornerRadius="8dp"/>
+
+            <!-- The quantity selector, hidden by default -->
+            <LinearLayout
+                android:id="@+id/quantitySelector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:background="@drawable/background_of_category_item"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="1dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/productImageViewCart"
+                tools:visibility="visible"> <!-- tools:visibility makes it visible in preview -->
+
+                <ImageButton
+                    android:id="@+id/minusButton"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:background="#00FF0000"
+                    android:gravity="center"
+                    android:paddingStart="12dp"
+                    android:rotation="-90"
+                    android:src="@drawable/ic_arrow_back"
+                    android:textColor="@color/cardview_dark_background" />
+
+                <TextView
+                    android:id="@+id/quantityTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@color/buy_now_green"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/PlusBtn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="#00FF0000"
+                    android:gravity="center"
+                    android:paddingStart="15dp"
+                    android:rotation="90"
+                    android:src="@drawable/ic_arrow_back"
+                    android:textColor="@color/cardview_dark_background" />
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

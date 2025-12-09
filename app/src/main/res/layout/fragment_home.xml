@@ -5,14 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1F3F6"
+    android:background="@color/white"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white">
+        android:background="@drawable/background2">
 
         <!-- Your existing Toolbar and SearchBar code remains here -->
         <LinearLayout
@@ -30,15 +30,17 @@
                 android:textStyle="bold"
                 android:paddingVertical="5dp"
                 android:scrollHorizontally="true"
-                android:focusable="true"
+                android:clickable="true"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
                 android:paddingHorizontal="15dp"
-                android:focusableInTouchMode="true"
                 android:freezesText="true"
                 android:text="Deliver To: " />
 
         </LinearLayout>
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/searchBarCard"
+            android:background="@drawable/background_of_category_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
@@ -49,6 +51,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/white"
                 android:gravity="center_vertical"
                 android:padding="8dp">
                 <ImageView
@@ -84,7 +87,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="16dp">
+            android:paddingBottom="100dp">
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/shimmer_ct"

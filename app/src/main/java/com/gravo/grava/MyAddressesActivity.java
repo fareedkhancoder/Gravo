@@ -9,6 +9,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +42,12 @@ public class MyAddressesActivity extends AppCompatActivity implements AddressAda
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_addresses);
+        // Handle window insets for edge-to-edge display
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         Toolbar toolbar = findViewById(R.id.toolbarMyAddresses);
         setSupportActionBar(toolbar);
@@ -101,6 +110,7 @@ public class MyAddressesActivity extends AppCompatActivity implements AddressAda
             } else { // NORMAL
                 Intent intent = new Intent(this, AddEditAddressActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -174,7 +184,35 @@ public class MyAddressesActivity extends AppCompatActivity implements AddressAda
                     .setTitle("Delete Address")
                     .setMessage("Are you sure you want to delete this address?")
                     .setPositiveButton("Delete", (dialog, which) -> {
-                        // TODO: Add logic to delete from Firestore here
+                        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                        if (currentUser == null) return;
+
+                        // Show a loading indicator here if you have one (optional)
+
+                        db.collection("users").document(currentUser.getUid())
+                                .collection("addresses")
+                                .document(address.getAddressId())
+                                .delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    // 1. Success Feedback
+                                    Toast.makeText(this, "Address deleted successfully", Toast.LENGTH_SHORT).show();
+
+                                    // 2. Update the UI (Remove from RecyclerView)
+                                    // If you are NOT using FirestoreRecyclerAdapter, you must remove the item manually:
+                                    if (addressList != null && addressAdapter != null) {
+                                        int position = addressList.indexOf(address);
+                                        if (position != -1) {
+                                            addressList.remove(position);
+                                            addressAdapter.notifyItemRemoved(position);
+                                            // Optional: update range if needed
+                                            // addressAdapter.notifyItemRangeChanged(position, addressList.size());
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    // 3. Failure Feedback
+                                    Toast.makeText(this, "Failed to delete: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
                     })
                     .setNegativeButton("Cancel", null)
                     .show();

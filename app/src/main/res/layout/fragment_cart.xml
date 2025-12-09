@@ -9,16 +9,20 @@
     tools:context=".CartFragment">
 
     <!-- Toolbar for the Cart Screen -->
-    <com.google.android.material.appbar.MaterialToolbar
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/toolbarCart"
-        android:layout_width="0dp"
-        android:layout_height="?attr/actionBarSize"
-        app:title="My Cart"
-        android:background="?attr/colorSurface"
-        android:elevation="4dp"
+        android:layout_width="match_parent"
+        app:strokeWidth="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Cart Items"/>
+    </com.google.android.material.card.MaterialCardView>
 
     <!-- RecyclerView to display all cart items -->
     <androidx.recyclerview.widget.RecyclerView

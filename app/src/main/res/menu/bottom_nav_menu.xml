@@ -13,6 +13,7 @@
     <item
         android:id="@+id/nav_cart"
         android:icon="@drawable/ic_cart"
+        android:menuCategory="alternative"
         android:title="Cart" />
 
     <item

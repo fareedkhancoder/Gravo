@@ -41,6 +41,7 @@
             android:textStyle="bold"
             android:paddingHorizontal="16dp"
             android:paddingTop="8dp"
+            android:maxLines="1"
             app:layout_constraintBottom_toTopOf="@id/productPriceBannerTextView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -2,10 +2,16 @@ package com.gravo.grava;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -17,6 +23,8 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHomeFragmentInteractionListener {
+    private long backPressedTime;
+    private Toast backToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,35 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
 
         // Set up the listener for user taps
         setupBottomNavigationListener();
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Get the current fragment
+                Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+                // Check if the current fragment is HomeFragment
+                if (currentFragment instanceof HomeFragment) {
+                    // Logic for "Press again to exit"
+                    if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                        if (backToast != null) backToast.cancel();
+                        finish(); // Exit the app
+                    } else {
+                        backToast = Toast.makeText(getBaseContext(), "Press back again to exit", Toast.LENGTH_SHORT);
+                        backToast.show();
+                    }
+                    backPressedTime = System.currentTimeMillis();
+                } else {
+                    // If not on HomeFragment, go to HomeFragment
+                    BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+
+                    // We simply change the selected item to Home.
+                    // This triggers the BottomNavigation listener we already set up,
+                    // which handles the fragment replacement for us.
+                    bottomNavigationView.setSelectedItemId(R.id.nav_home);
+                }
+            }
+        });
     }
 
     /**
@@ -46,23 +83,48 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
     private void setupBottomNavigationListener() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            // --- NEW CODE STARTS HERE ---
+            // Check if the user clicked the tab they are currently on
+            if (bottomNavigationView.getSelectedItemId() == item.getItemId()) {
+                vibrator(40);
+
+                return false; // Return false to prevent reload
+            }
+            // --- NEW CODE ENDS HERE ---
+
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
                 replaceFragment(new HomeFragment());
+                vibrator(30);
                 return true;
             } else if (itemId == R.id.nav_cart) {
                 replaceFragment(new CartFragment());
+                vibrator(30);
                 return true;
             } else if (itemId == R.id.nav_account) {
                 replaceFragment(new AccountFragment());
+                vibrator(30);
                 return true;
             } else if (itemId == R.id.nav_categories) {
-                // This now only triggers for a direct user tap on the categories icon
                 replaceFragment(new CategoriesFragment());
+                vibrator(30);
                 return true;
             }
             return false;
         });
+    }
+    private void vibrator(int duration){
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (v != null) {
+            // Vibrate for 50 milliseconds
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                v.vibrate(VibrationEffect.createOneShot(duration, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                // Deprecated in API 26, but necessary for older phones
+                v.vibrate(duration);
+            }
+        }
     }
 
     private void replaceFragment(Fragment fragment) {
@@ -95,4 +157,5 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
         // Re-attach the listener so it works for manual user taps again.
         setupBottomNavigationListener();
     }
+
 }

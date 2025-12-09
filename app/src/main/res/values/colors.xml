@@ -5,6 +5,12 @@
     <color name="green">#00FF00</color>
     <color name="placeholder_bg">#DDDDDD</color>
     <color name="purple_500">#FF6200EE</color>
+    <color name="purple_theme">#673AB7</color>
+    <color name="purple_dark">#512DA8</color>
+    <color name="red_logout">#D32F2F</color>
+    <color name="background_gray">#F5F5F5</color>
+    <color name="text_dark">#333333</color>
+    <color name="text_gray">#888888</color>
 
 
 </resources>

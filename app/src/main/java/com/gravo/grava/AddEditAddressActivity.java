@@ -1,5 +1,6 @@
 package com.gravo.grava;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -73,6 +74,7 @@ public class AddEditAddressActivity extends AppCompatActivity {
 
         saveAddressButton.setOnClickListener(v -> {
             saveAddress();
+            startActivity(new Intent(this, MyAddressesActivity.class));
         });
     }
 

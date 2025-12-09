@@ -7,7 +7,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Firebase ko poore app ke liye yahan initialize karein
+
         FirebaseApp.initializeApp(this);
     }
 }

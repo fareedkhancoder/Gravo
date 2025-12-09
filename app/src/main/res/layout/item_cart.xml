@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="8dp"
-    android:layout_marginTop="8dp">
+    android:layout_marginTop="8dp"
+    app:cardPreventCornerOverlap="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,44 +18,96 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
 
         <TextView
             android:id="@+id/productNameTextViewCart"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:maxLength="26"
+            android:maxLines="1"
             android:textAppearance="?attr/textAppearanceSubtitle1"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/productImageViewCart"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Men's Slim Fit T-Shirt" />
+
+        <ImageView
+            android:id="@+id/deleteAddressButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Delete cart item"
+            android:padding="2dp"
+            android:src="@drawable/ic_delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorError" />
+
 
         <TextView
             android:id="@+id/productPriceTextViewCart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:layout_marginStart="8dp"
             android:textAppearance="?attr/textAppearanceBody1"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/productNameTextViewCart"
             app:layout_constraintStart_toEndOf="@id/productImageViewCart"
+            app:layout_constraintTop_toBottomOf="@+id/productNameTextViewCart"
             tools:text="₹499.00" />
 
         <!-- NAYA: Quantity dikhane ke liye TextView -->
-        <TextView
-            android:id="@+id/quantityTextViewCart"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/quantitySelector"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceBody2"
-            app:layout_constraintTop_toBottomOf="@id/productPriceTextViewCart"
-            app:layout_constraintStart_toEndOf="@id/productImageViewCart"
-            tools:text="Qty: 2" />
+            android:gravity="center"
+            android:background="#F9DEDC"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="20dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/productImageViewCart"
+            tools:visibility="visible"> <!-- tools:visibility makes it visible in preview -->
+
+            <ImageButton
+                android:id="@+id/minusButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#00FF0000"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:rotation="-90"
+                android:src="@drawable/ic_arrow_back"
+                android:textColor="@color/cardview_dark_background"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/quantityTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/buy_now_green"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/PlusBtn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#00FF0000"
+                android:gravity="center"
+                android:paddingStart="15dp"
+                android:rotation="90"
+                android:src="@drawable/ic_arrow_back"
+                android:textColor="@color/cardview_dark_background"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,116 +1,273 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F1F3F6"
-    tools:context=".AccountFragment">
+    android:background="@color/background_gray">
 
-    <!-- Top Profile Section -->
-    <com.google.android.material.card.MaterialCardView
+    <View
+        android:id="@+id/viewHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardElevation="0dp">
+        android:layout_height="220dp"
+        android:background="#FEF7FF"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/viewHeader">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:gravity="center">
+            android:paddingBottom="20dp">
 
-            <TextView
-                android:id="@+id/profileInitialsTextView"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:background="@drawable/profile_initials_background"
-                android:gravity="center"
-                tools:text="FK"
-                android:textColor="@android:color/white"
-                android:textSize="32sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/userNameTextView"
-                android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardProfile"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="15dp"
+                app:cardBackgroundColor="#ffd8e4"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:cardBackgroundColor="@color/purple_theme"
+                        app:cardCornerRadius="40dp"
+                        app:cardElevation="0dp">
+
+                        <TextView
+                            android:id="@+id/profileInitialsTextView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="FK"
+                            android:textColor="@color/white"
+                            android:textSize="40sp" />
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:id="@+id/userNameTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Fareed Khan"
+                        android:textColor="@color/text_dark"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/userEmailTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="khanfareed01131@gmail.com"
+                        android:textColor="@color/text_gray"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardOrders"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="8dp"
+                app:cardBackgroundColor="#F9DEDC"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toStartOf="@id/cardAddresses"
+                app:layout_constraintStart_toStartOf="@id/cardProfile"
+                app:layout_constraintTop_toBottomOf="@id/cardProfile">
+
+                <LinearLayout
+                    android:id="@+id/myOrdersOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/outline_deployed_code_history_24"
+                        app:tint="@color/cardview_dark_background" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="My Orders"
+                        android:textColor="@color/cardview_dark_background" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAddresses"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="#F9DEDC"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toEndOf="@id/cardProfile"
+                app:layout_constraintStart_toEndOf="@id/cardOrders"
+                app:layout_constraintTop_toBottomOf="@id/cardProfile">
+
+                <LinearLayout
+                    android:id="@+id/myAddressesOption"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_address"
+                        app:tint="@color/cardview_dark_background" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="My Addresses"
+                        android:textColor="@color/cardview_dark_background" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWallet"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
                 android:layout_marginTop="16dp"
-                tools:text="Fareed Khan"
-                android:textAppearance="?attr/textAppearanceHeadline6"/>
+                android:layout_marginEnd="8dp"
+                app:cardBackgroundColor="#F9DEDC"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toStartOf="@id/cardWishlist"
+                app:layout_constraintStart_toStartOf="@id/cardProfile"
+                app:layout_constraintTop_toBottomOf="@id/cardOrders">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/baseline_account_balance_wallet_24"
+                        app:tint="@color/cardview_dark_background" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="My Wallet"
+                        android:textColor="@color/cardview_dark_background" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWishlist"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="#F9DEDC"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toEndOf="@id/cardProfile"
+                app:layout_constraintStart_toEndOf="@id/cardWallet"
+                app:layout_constraintTop_toBottomOf="@id/cardAddresses">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/star_on"
+                        app:tint="#FF69C7" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Wishlist"
+                        android:textColor="@color/cardview_dark_background" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardHelp"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                app:cardBackgroundColor="#F9DEDC"
+                app:cardCornerRadius="12dp"
+                app:layout_constraintEnd_toStartOf="@id/cardWishlist"
+                app:layout_constraintStart_toStartOf="@id/cardProfile"
+                app:layout_constraintTop_toBottomOf="@id/cardWallet">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_menu_help"
+                        app:tint="@color/purple_theme" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Help Center"
+                        android:textColor="@color/cardview_dark_background" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/userEmailTextView"
+                android:id="@+id/logoutButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                tools:text="Fareed@example.com"
-                android:textAppearance="?attr/textAppearanceBody2"/>
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="2dp"
+                android:text="Logout"
+                android:textColor="@color/red_logout"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@id/cardProfile"
+                app:layout_constraintStart_toStartOf="@id/cardProfile"
+                app:layout_constraintTop_toBottomOf="@id/cardHelp" />
 
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Menu Options -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="My Account"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        android:textAppearance="?attr/textAppearanceTitleMedium"/>
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:cardElevation="0dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/myOrdersOption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="My Orders"
-                android:drawableStart="@drawable/ic_orders"
-                android:drawablePadding="16dp"
-                android:padding="16dp"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground"/>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#E0E0E0"
-                android:layout_marginStart="56dp"/>
-
-            <TextView
-                android:id="@+id/myAddressesOption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="My Addresses"
-                android:drawableStart="@drawable/ic_address"
-                android:drawablePadding="16dp"
-                android:padding="16dp"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackground"/>
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Logout Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/logoutButton"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:textColor="?attr/colorError"
-        android:layout_margin="16dp"/>
-
-</LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

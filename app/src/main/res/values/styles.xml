@@ -10,4 +10,9 @@
         <item name="android:activityOpenEnterAnimation">@anim/slide_in_up</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_down</item>
     </style>
+    <style name="CustomShapeStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
 </resources>

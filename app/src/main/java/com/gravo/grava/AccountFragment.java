@@ -6,12 +6,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,8 +29,9 @@ public class AccountFragment extends Fragment {
     private FirebaseFirestore db;
 
     // UI Elements
-    private TextView profileInitialsTextView, userNameTextView, userEmailTextView, myOrdersOption, myAddressesOption;
-    private Button logoutButton;
+    private TextView profileInitialsTextView;
+    private TextView userNameTextView;
+    private TextView userEmailTextView;
 
 
     @Nullable
@@ -49,9 +52,9 @@ public class AccountFragment extends Fragment {
         profileInitialsTextView = view.findViewById(R.id.profileInitialsTextView);
         userNameTextView = view.findViewById(R.id.userNameTextView);
         userEmailTextView = view.findViewById(R.id.userEmailTextView);
-        logoutButton = view.findViewById(R.id.logoutButton);
-        myOrdersOption = view.findViewById(R.id.myOrdersOption);
-        myAddressesOption = view.findViewById(R.id.myAddressesOption);
+        TextView logoutButton = view.findViewById(R.id.logoutButton);
+        LinearLayout myOrdersOption = view.findViewById(R.id.myOrdersOption);
+        LinearLayout myAddressesOption = view.findViewById(R.id.myAddressesOption);
 
 
         // Load user data

@@ -60,7 +60,6 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
             productImageView = itemView.findViewById(R.id.productImageViewCart);
             productNameTextView = itemView.findViewById(R.id.productNameTextViewCart);
             productPriceTextView = itemView.findViewById(R.id.productPriceTextViewCart);
-            quantityTextView = itemView.findViewById(R.id.quantityTextViewCart); // ID se find karein
         }
     }
 }

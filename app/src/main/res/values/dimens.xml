@@ -1,0 +1,5 @@
+<resources>
+    <dimen name="design_bottom_navigation_item_max_width">70dp</dimen>
+    <dimen name="design_bottom_navigation_margin">0dp</dimen>
+    <dimen name="design_bottom_navigation_height">50dp</dimen>
+</resources>

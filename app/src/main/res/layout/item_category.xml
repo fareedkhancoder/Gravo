@@ -3,28 +3,40 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/category_item_root"
-    android:layout_width="88dp"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="8dp"
-    android:background="?android:attr/selectableItemBackground"> <ImageView
-    android:id="@+id/categoryImageView"
-    android:layout_width="48dp"
-    android:layout_height="48dp"
-    android:scaleType="centerCrop"
-    tools:src="@mipmap/ic_launcher"
-    android:contentDescription="Category Icon"
-    android:background="@android:color/transparent" /> <TextView
-    android:id="@+id/categoryNameTextView"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="4dp"
+    android:orientation="vertical"
+    android:layout_marginStart="10dp"
+    android:gravity="center"
+    android:elevation="15dp"
+    android:padding="1dp"
+    android:background="@android:color/transparent" >
+    <LinearLayout
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:gravity="center"
+        android:background="@drawable/category_outline">
+        <ImageView
+            android:id="@+id/categoryImageView"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@mipmap/ic_launcher"
+            android:contentDescription="Category Icon"
+            android:background="@android:color/transparent" />
+    </LinearLayout>
+    <TextView
+    android:id="@+id/categoryNameTextView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="1dp"
     android:text="Category"
     android:textSize="12sp"
-    android:maxLines="2"
+        android:textStyle="bold"
+    android:maxLines="1"
     android:ellipsize="end"
     android:gravity="center"
-    android:textColor="?attr/colorOnSurface" />
+    android:textColor="@color/black" />
 
 </LinearLayout>

@@ -33,6 +33,11 @@ public class Product implements Serializable {
     @PropertyName("tags_lowercase")
     private List<String> tagsLowercase;
 
+    // --- NEW FIELD ---
+    // This field tracks the quantity in the cart. It is not saved to Firestore
+    // with the product, it's for local app state only.
+    private int quantityInCart = 0;
+
     // A no-argument constructor is required for Firestore.
     public Product() {}
 
@@ -88,6 +93,16 @@ public class Product implements Serializable {
 
     @PropertyName("tags_lowercase")
     public void setTagsLowercase(List<String> tagsLowercase) { this.tagsLowercase = tagsLowercase; }
+
+    // --- Getter and Setter for quantityInCart ---
+
+    public int getQuantityInCart() {
+        return quantityInCart;
+    }
+
+    public void setQuantityInCart(int quantityInCart) {
+        this.quantityInCart = quantityInCart;
+    }
 
     // Provides a readable string for easy debugging.
     @Override
