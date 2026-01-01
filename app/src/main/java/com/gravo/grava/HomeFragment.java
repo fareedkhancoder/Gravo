@@ -58,7 +58,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private List<Category> categoryList;
     private List<Product> dealsList;
     private List<Product> trendingList;
-    private List<Product> bannerProductList;
+    private List<Banner> bannerList;
 
     // Auto-slide Handler
     private final Handler sliderHandler = new Handler();
@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         categoryList = new ArrayList<>();
         dealsList = new ArrayList<>();
         trendingList = new ArrayList<>();
-        bannerProductList = new ArrayList<>();
+        bannerList = new ArrayList<>();
 
         // Initialize UI Components
         initializeViews(view);
@@ -154,7 +154,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     private void fetchAllData() {
         fetchCategories();
-        fetchBannerProducts();
+        fetchBanners();
         fetchDeals();
         fetchTrendingProducts();
         fetchDefaultAddress();
@@ -185,7 +185,9 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     private void setupBannerViewPager(View view) {
         bannerViewPager = view.findViewById(R.id.bannerViewPager);
-        bannerAdapter = new BannerAdapter(bannerProductList);
+
+        // CHANGE 3: Pass bannerList to the adapter
+        bannerAdapter = new BannerAdapter(bannerList);
         bannerViewPager.setAdapter(bannerAdapter);
 
         sliderRunnable = () -> {
@@ -223,23 +225,32 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         });
     }
 
-    private void fetchBannerProducts() {
-        db.collection("products").orderBy("stockQuantity", Query.Direction.ASCENDING).limit(4).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && getContext() != null) {
-                // CORRECTED: Stop shimmer outside the loop
-                shimmerbanner.stopShimmer();
-                shimmerbanner.setVisibility(View.GONE);
-                bannerViewPager.setVisibility(View.VISIBLE);
+    private void fetchBanners() {
+        db.collection("Banners")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && getContext() != null) {
+                        shimmerbanner.stopShimmer();
+                        shimmerbanner.setVisibility(View.GONE);
+                        bannerViewPager.setVisibility(View.VISIBLE);
 
-                bannerProductList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Product product = document.toObject(Product.class);
-                    product.setProductId(document.getId());
-                    bannerProductList.add(product);
-                }
-                if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
-            }
-        });
+                        bannerList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Map to Banner.class instead of Product.class
+                            Banner banner = document.toObject(Banner.class);
+                            bannerList.add(banner);
+                        }
+                        if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
+
+                        // Restart the slider handler now that we have data
+                        if (!bannerList.isEmpty()) {
+                            sliderHandler.removeCallbacks(sliderRunnable);
+                            sliderHandler.postDelayed(sliderRunnable, 3000);
+                        }
+                    } else {
+                        Log.e(TAG, "Error fetching banners", task.getException());
+                    }
+                });
     }
 
     private void fetchDeals() {
@@ -334,8 +345,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     @Override
     public void onResume() {
         super.onResume();
-        // Start slider only if there are items
-        if(bannerProductList != null && !bannerProductList.isEmpty()){
+        if(bannerList != null && !bannerList.isEmpty()){
             sliderHandler.postDelayed(sliderRunnable, 5000);
         }
     }

@@ -93,7 +93,7 @@ public class OrderTrackActivity extends AppCompatActivity {
         rvOrderSteps.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         statusList = new ArrayList<>();
         // Initialize with default steps
-        statusList.add(new OrderStatus("Placed", false));
+        statusList.add(new OrderStatus("Pending", false));
         statusList.add(new OrderStatus("Processing", false));
         statusList.add(new OrderStatus("Shipped", false));
         statusList.add(new OrderStatus("Delivered", false));
@@ -161,7 +161,7 @@ public class OrderTrackActivity extends AppCompatActivity {
                 shipped = true;
             case "processing":
                 processing = true;
-            case "placed":
+            case "pending":
                 placed = true;
                 break;
         }

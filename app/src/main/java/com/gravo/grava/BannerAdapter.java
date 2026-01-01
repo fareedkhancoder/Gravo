@@ -1,4 +1,3 @@
-// BannerAdapter.java
 package com.gravo.grava;
 
 import android.content.Context;
@@ -6,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,10 +15,11 @@ import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
 
-    private List<Product> productList;
+    // CHANGE 1: अब हम Product की जगह Banner लिस्ट यूज़ कर रहे हैं
+    private List<Banner> bannerList;
 
-    public BannerAdapter(List<Product> productList) {
-        this.productList = productList;
+    public BannerAdapter(List<Banner> bannerList) {
+        this.bannerList = bannerList;
     }
 
     @NonNull
@@ -32,54 +31,42 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        // 1. CRASH PREVENTION: Check if the list is empty before proceeding.
-        if (productList == null || productList.isEmpty()) {
+        // Crash Prevention
+        if (bannerList == null || bannerList.isEmpty()) {
             return;
         }
 
-        // 2. INFINITE SCROLL: Calculate the actual position.
-        int actualPosition = position % productList.size();
-        Product product = productList.get(actualPosition);
-
-        // Get context once for reuse.
+        // Infinite Scroll Logic
+        int actualPosition = position % bannerList.size();
+        Banner banner = bannerList.get(actualPosition);
         Context context = holder.itemView.getContext();
 
-        // 3. USE GETTERS: Access data using public getter methods.
-        holder.productNameTextView.setText(product.getName());
-
-        // 4. USE STRING RESOURCES: Set the price using the resource from strings.xml.
-        String formattedPrice = context.getString(R.string.price_format_from, product.getPrice());
-        holder.productPriceTextView.setText(formattedPrice);
-
-        // 5. USE GETTERS for image URLs.
-        if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+        // CHANGE 2: सिर्फ इमेज लोड करेंगे (Name/Price का कोड हटा दिया है)
+        if (banner.getImage() != null && !banner.getImage().isEmpty()) {
             Glide.with(context)
-                    .load(product.getImageUrls().get(0))
+                    .load(banner.getImage())
                     .into(holder.bannerImageView);
         } else {
-            // Optional: Set a placeholder image if no images are available.
-            holder.bannerImageView.setImageResource(R.drawable.ic_placeholder); // Example placeholder
+            // Placeholder अगर इमेज न हो
+            holder.bannerImageView.setImageResource(R.drawable.ic_placeholder);
         }
     }
 
     @Override
     public int getItemCount() {
-        if (productList == null || productList.isEmpty()) {
+        if (bannerList == null || bannerList.isEmpty()) {
             return 0;
         }
-        return productList.size() > 1 ? Integer.MAX_VALUE : productList.size();
+        return bannerList.size() > 1 ? Integer.MAX_VALUE : bannerList.size();
     }
 
     public static class BannerViewHolder extends RecyclerView.ViewHolder {
         ImageView bannerImageView;
-        TextView productNameTextView;
-        TextView productPriceTextView;
 
         public BannerViewHolder(@NonNull View itemView) {
             super(itemView);
+            // CHANGE 3: सिर्फ ImageView को find कर रहे हैं
             bannerImageView = itemView.findViewById(R.id.bannerImageView);
-            productNameTextView = itemView.findViewById(R.id.productNameBannerTextView);
-            productPriceTextView = itemView.findViewById(R.id.productPriceBannerTextView);
         }
     }
 }

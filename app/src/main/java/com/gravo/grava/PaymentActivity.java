@@ -97,8 +97,9 @@ public class PaymentActivity extends AppCompatActivity {
         orderData.put("orderDate", FieldValue.serverTimestamp());
         orderData.put("shippingAddress", selectedAddress);
         orderData.put("totalAmount", totalPayable);
+        // TODO: ADD MORE PAYMENT METHODS IN FUTURE LIKE PHONE PAY, PAYTM
         orderData.put("paymentMethod", "Cash on Delivery");
-        orderData.put("orderStatus", "Placed");
+        orderData.put("orderStatus", "Pending");
 
         List<Map<String, Object>> orderItemsList = new ArrayList<>();
         for (CartItem item : summaryItems) {
@@ -106,11 +107,18 @@ public class PaymentActivity extends AppCompatActivity {
             batch.update(productRef, "stockQuantity", FieldValue.increment(-item.getQuantity()));
 
             Map<String, Object> orderItemMap = new HashMap<>();
-            orderItemMap.put("productId", item.getProduct().getProductId());
-            orderItemMap.put("name", item.getProduct().getCategoryId());
+            orderItemMap.put("productName", item.getProduct().getName());
+            // --- KEY ADDITION: Save Name here so it shows in your Dashboard immediately ---
+            // Make sure your Address class has a getName() or getFullName() method
+            orderData.put("customerName", selectedAddress.getFullName());
+            // -----------------------------------------------------------------------------
+            orderItemMap.put("CategoryId", item.getProduct().getCategoryId());
             orderItemMap.put("priceAtPurchase", item.getProduct().getPrice());
             orderItemMap.put("quantity", item.getQuantity());
-            orderItemMap.put("imageUrl", item.getProduct().getImageUrls()); // Add this line
+            // Save only the first image (thumbnail)
+            List<String> urls = item.getProduct().getImageUrls();
+            String thumbnail = (urls != null && !urls.isEmpty()) ? urls.get(0) : "";
+            orderItemMap.put("imageUrl", thumbnail);// Add this line
             orderItemsList.add(orderItemMap);
         }
         orderData.put("items", orderItemsList);

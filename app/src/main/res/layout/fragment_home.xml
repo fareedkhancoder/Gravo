@@ -5,37 +5,73 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/gradient2"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background2">
+        android:background="@drawable/gradient2">
 
         <!-- Your existing Toolbar and SearchBar code remains here -->
         <LinearLayout
             android:id="@+id/toolbar"
+            android:layout_margin="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_scrollFlags="scroll|enterAlways|snap">
             <TextView
                 android:id="@+id/address"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
                 android:ellipsize="end"
+                android:layout_weight="3"
                 android:singleLine="true"
-                android:textStyle="bold"
-                android:paddingVertical="5dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                android:layout_margin="3dp"
+                android:textColor="@color/white"
+                android:textStyle="normal|bold"
+                android:paddingVertical="2dp"
                 android:scrollHorizontally="true"
                 android:clickable="true"
+                android:background="@drawable/adddress_background"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
-                android:paddingHorizontal="15dp"
+                android:paddingHorizontal="10dp"
                 android:freezesText="true"
-                android:text="Deliver To: " />
+                android:text="Home: " />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1.3"
+                android:padding="2dp"
+                android:contentDescription="Current Delivery Slot"
+                android:background="@drawable/slot_background"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="5dp"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10 Jan"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:gravity="center_horizontal"
+                    android:textSize="14sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="8 AM - 11 AM"
+                    android:textSize="12sp"
+                    android:gravity="center"
+                    android:textColor="@color/white"/>
+
+            </LinearLayout>
 
         </LinearLayout>
         <com.google.android.material.card.MaterialCardView
@@ -43,9 +79,9 @@
             android:background="@drawable/background_of_category_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="5dp"
             app:cardCornerRadius="8dp"
             app:cardElevation="2dp">
             <LinearLayout
@@ -120,15 +156,15 @@
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/bannerViewPager"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="230dp"
                 android:visibility="gone"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginTop="2dp"/>
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/slideshow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="2dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

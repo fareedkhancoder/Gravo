@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -53,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
     // UI Elements
     private MaterialButton googleLoginButton, loginButton;
     private ProgressBar progressBar;
+    private LinearLayout loadingbar;
+    private TextView loading;
     private TextInputEditText phoneEditText;
 
     // Phone Auth
@@ -69,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
         progressBar = findViewById(R.id.progressBar);
         phoneEditText = findViewById(R.id.phoneEditText);
+        loading = findViewById(R.id.loading);
+        loadingbar = findViewById(R.id.progressbar_layout);
+        loading.setVisibility(View.GONE);
+        loadingbar.setVisibility(View.GONE);
         progressBar.setVisibility(View.GONE); // Initially hide progress bar
 
         // Initialize Firebase and Google Auth
@@ -271,10 +279,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void showLoading(boolean isLoading) {
         if (isLoading) {
+            loading.setVisibility(View.VISIBLE);
+            loadingbar.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.VISIBLE);
             loginButton.setEnabled(false);
             googleLoginButton.setEnabled(false);
         } else {
+            loading.setVisibility(View.GONE);
+            loadingbar.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             loginButton.setEnabled(true);
             googleLoginButton.setEnabled(true);
