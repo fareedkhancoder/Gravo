@@ -4,12 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="@drawable/app_background_gradient"
+    android:background="@drawable/background2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".HomeActivity">
 
-    <!-- Yeh FrameLayout fragments ke liye container hai -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="0dp"
@@ -21,14 +20,27 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
+
         android:layout_height="wrap_content"
+
+        style="@style/Widget.Design.BottomNavigationView"
+
         android:background="@color/white"
-        android:foregroundGravity="bottom"
-        app:elevation="15dp"
-        android:layout_marginBottom="-25dp"
-        app:itemTextColor="#0E8319"
+        app:elevation="8dp"
+
         app:labelVisibilityMode="labeled"
+
+        app:itemTextAppearanceActive="@style/FlipkartNavText"
+        app:itemTextAppearanceInactive="@style/FlipkartNavText"
+
+        app:itemIconTint="@color/nav_selector"
+        app:itemTextColor="@color/nav_selector"
+        app:itemIconSize="30dp"
+
+        app:itemPaddingTop="2dp"
+        app:itemPaddingBottom="0dp"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -14,39 +14,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbarSearch"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_arrow_back">
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/searchBarCard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingVertical="8dp"
-                app:cardCornerRadius="20dp"
-                app:cardBackgroundColor="@color/white"
-                android:background="@color/white"
-                android:layout_marginEnd="10dp"
-                app:cardElevation="2dp">
+                android:layout_height="48dp"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                app:cardBackgroundColor="#00000000"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
 
-                <EditText
-                    android:id="@+id/searchEditText"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:layout_marginStart="8dp"
-                    android:hint="Search for Products, Brands and More"
-                    android:textSize="14sp"
-                    android:imeOptions="actionSearch"
-                    android:background="@color/white"
-                    android:inputType="text"
-                    android:paddingHorizontal="10dp"
-                    android:maxLines="1"/>
+                    android:layout_height="match_parent"
+                    android:background="@drawable/gradient2"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
 
+                    <ImageView
+                        android:id="@+id/back_btn"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_arrow_back"
+                        app:tint="@color/black" />
+
+                    <EditText
+                        android:id="@+id/searchEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+
+                        android:inputType="text"
+                        android:imeOptions="actionSearch"
+                        android:importantForAutofill="no"
+
+                        android:hint="Search for Products, Brands and More"
+                        android:textColorHint="#9E9E9E"
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+
+                        android:cursorVisible="true"
+                        android:textCursorDrawable="@null"
+                        android:selectAllOnFocus="true" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/black" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <ListView

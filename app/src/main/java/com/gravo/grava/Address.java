@@ -53,7 +53,7 @@ public class Address implements Serializable {
         StringBuilder sb = new StringBuilder();
 
         if (fullName != null && !fullName.isEmpty()) {
-            sb.append(fullName).append("\n");
+            sb.append(fullName).append(",");
         }
 
         if (street != null && !street.isEmpty()) {
@@ -73,7 +73,7 @@ public class Address implements Serializable {
         }
 
         if (phone != null && !phone.isEmpty()) {
-            sb.append("\nPhone: ").append(phone);
+            sb.append(",Phone: ").append(phone);
         }
 
         if (type != null && !type.isEmpty()) {

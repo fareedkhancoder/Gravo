@@ -3,6 +3,7 @@ package com.gravo.grava;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,6 +13,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -75,10 +77,10 @@ public class SearchActivity extends AppCompatActivity implements ProductAdapter.
         db = FirebaseFirestore.getInstance();
         sharedPreferences = getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE);
 
-        Toolbar toolbar = findViewById(R.id.toolbarSearch);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        ImageView back_btn = findViewById(R.id.back_btn);
+        back_btn.setOnClickListener(v -> {
+            finish();
+        });
 
         searchEditText = findViewById(R.id.searchEditText);
         searchResultsRecyclerView = findViewById(R.id.searchResultsRecyclerView);

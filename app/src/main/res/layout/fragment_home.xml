@@ -5,123 +5,189 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient2"
+    android:background="#00FFFFFF"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient2">
+        android:background="#00FFFFFF"
+        app:liftOnScroll="false"
+        app:liftOnScrollColor="@android:color/transparent"
+        android:elevation="0dp"
+        app:elevation="0dp">
 
-        <!-- Your existing Toolbar and SearchBar code remains here -->
-        <LinearLayout
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_margin="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            app:layout_scrollFlags="scroll|enterAlways|snap">
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:ellipsize="end"
-                android:layout_weight="3"
-                android:singleLine="true"
-                android:gravity="center_vertical"
-                android:textSize="12sp"
-                android:layout_margin="3dp"
-                android:textColor="@color/white"
-                android:textStyle="normal|bold"
-                android:paddingVertical="2dp"
-                android:scrollHorizontally="true"
-                android:clickable="true"
-                android:background="@drawable/adddress_background"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:paddingHorizontal="10dp"
-                android:freezesText="true"
-                android:text="Home: " />
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1.3"
-                android:padding="2dp"
-                android:contentDescription="Current Delivery Slot"
-                android:background="@drawable/slot_background"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginVertical="5dp"
-                android:orientation="vertical"
-                android:gravity="center">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="10 Jan"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:gravity="center_horizontal"
-                    android:textSize="14sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="8 AM - 11 AM"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/white"/>
+            android:contentInsetStart="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetEnd="0dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
-            </LinearLayout>
-
-        </LinearLayout>
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/searchBarCard"
-            android:background="@drawable/background_of_category_item"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="5dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="2dp">
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="0dp">
+
+                <LinearLayout
+                    android:id="@+id/address_container"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/adddress_background"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/layout_icons"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/img_location_pin"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/baseline_location_on_24"
+                        app:tint="@color/black" />
+
+                    <LinearLayout
+                        android:id="@+id/layout_delivery_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/address"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.9"
+                            android:ellipsize="end"
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:text="Deliver to: Fetching address..."
+                            android:textColor="@color/black"
+                            android:textSize="11sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tv_delivery_slot"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="10 Jan, 8 AM - 11 AM"
+                                android:textColor="@color/black"
+                                android:textSize="13sp"
+                                android:textStyle="bold" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_marginStart="2dp"
+                                android:src="@drawable/baseline_arrow_drop_down_24"
+                                app:tint="@color/white" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_icons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/btn_cart"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_cart"
+                        app:tint="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/btn_notification"
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:src="@drawable/bell"
+                        app:tint="@color/white" />
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/searchBarCard"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            app:cardBackgroundColor="#00000000"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient2"
                 android:gravity="center_vertical"
-                android:padding="8dp">
+                android:paddingHorizontal="12dp">
+
                 <ImageView
-                    android:id="@+id/search_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_search"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="@color/black" />
+
                 <TextView
                     android:id="@+id/search"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="12dp"
                     android:text="Search for Products, Brands and More"
-                    android:textSize="14sp"/>
+                    android:textColor="@color/black"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textSize="14sp" />
+
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="12dp"
                     android:src="@drawable/ic_camera"
-                    app:tint="?android:attr/textColorSecondary"/>
+                    app:tint="@color/black" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#00FFFFFF"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#00000000"
             android:orientation="vertical"
             android:paddingBottom="100dp">
 
@@ -140,59 +206,69 @@
                 </LinearLayout>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/categoriesRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingVertical="8dp"
-                android:visibility="gone"
                 android:clipToPadding="false"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                tools:listitem="@layout/item_category"/>
-
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/bannerViewPager"
-                android:layout_width="match_parent"
-                android:layout_height="230dp"
+                android:orientation="horizontal"
+                android:padding="8dp"
                 android:visibility="gone"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginTop="2dp"/>
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/slideshow"
+                tools:listitem="@layout/item_category" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="5dp">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/bannerViewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <com.facebook.shimmer.ShimmerFrameLayout
+                    android:id="@+id/slideshow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#DDDDDD" />
+                </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+            </FrameLayout>
+            <LinearLayout
+                android:id="@+id/indicatorContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <include layout="@layout/item_product_grid_placeholder" />
-                </LinearLayout>
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                android:layout_gravity="bottom"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginHorizontal="16dp"
+                android:elevation="5dp"
+                android:gravity="center"
+                android:orientation="horizontal" />
 
-
-            <!-- Deals Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Deals of the Day"
-                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"/>
+                android:text="Deals of the Day"
+                android:textStyle="bold"
+                android:textSize="18sp" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/dealsShimmerLayout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_height="wrap_content">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
-                    <include layout="@layout/item_product_placeholder" />
                     <include layout="@layout/item_product_placeholder" />
                     <include layout="@layout/item_product_placeholder" />
                 </LinearLayout>
@@ -202,41 +278,19 @@
                 android:id="@+id/dealsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginTop="8dp"
-                android:clipToPadding="false"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:background="#00000000"
                 android:visibility="gone"
-                tools:listitem="@layout/item_product"/>
+                tools:listitem="@layout/item_product" />
 
-            <!-- Trending Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Trending Products"
-                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginStart="16dp"/>
-
-            <com.facebook.shimmer.ShimmerFrameLayout
-                android:id="@+id/trendingShimmerLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-                        <include layout="@layout/item_product_grid_placeholder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
-                        <include layout="@layout/item_product_grid_placeholder" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </com.facebook.shimmer.ShimmerFrameLayout>
+                android:text="Trending Products"
+                android:textStyle="bold"
+                android:textSize="18sp" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/trendingRecyclerView"
@@ -244,10 +298,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:nestedScrollingEnabled="false"
-                android:visibility="gone"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="2"
-                tools:listitem="@layout/item_product_grid"/>
+                android:visibility="gone" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/trendingShimmerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <include layout="@layout/item_product_grid_placeholder" />
+            </com.facebook.shimmer.ShimmerFrameLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

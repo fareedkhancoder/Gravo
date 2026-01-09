@@ -1,13 +1,18 @@
 package com.gravo.grava;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,13 +37,15 @@ import java.util.List;
 
 public class HomeFragment extends Fragment implements ProductAdapter.OnProductClickListener, CategoryAdapter.OnCategoryItemClickListener {
 
-    // 1. Interface for communication with the host activity
     public interface OnHomeFragmentInteractionListener {
         void navigateToCategories(String categoryId);
     }
-    private OnHomeFragmentInteractionListener mListener;
 
+    private OnHomeFragmentInteractionListener mListener;
     private static final String TAG = "HomeFragment";
+    private static final int SLIDE_DURATION = 3000; // 3 seconds per banner
+
+    // Firebase
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
 
@@ -47,23 +54,24 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private ShimmerFrameLayout shimmertrending, shimmerdeals, shimmerbanner, shimmerCategory;
     private TextView address;
     private ViewPager2 bannerViewPager;
+    private LinearLayout indicatorContainer;
 
-    // Adapters
+    // Adapters & Lists
     private CategoryAdapter categoryAdapter;
-    private ProductAdapter dealsAdapter;
-    private ProductAdapter trendingAdapter;
-    private BannerAdapter bannerAdapter; // CORRECTED: Removed extra semicolon
-
-    // Data Lists
+    private ProductAdapter dealsAdapter, trendingAdapter;
+    private BannerAdapter bannerAdapter;
     private List<Category> categoryList;
-    private List<Product> dealsList;
-    private List<Product> trendingList;
+    private List<Product> dealsList, trendingList;
     private List<Banner> bannerList;
 
-    // Auto-slide Handler
-    private final Handler sliderHandler = new Handler();
-    private Runnable sliderRunnable;
+    // Pagination ke liye naye variables
+    private com.google.firebase.firestore.DocumentSnapshot lastDealsVisible, lastTrendingVisible;
+    private boolean isDealsLoading = false, isTrendingLoading = false;
+    private boolean isDealsLastPage = false, isTrendingLastPage = false;
+    private static final int PAGE_SIZE = 7;
 
+    // Animation Logic
+    private ValueAnimator progressAnimator;
     private ActivityResultLauncher<Intent> addressLauncher;
 
     @Override
@@ -72,12 +80,10 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         if (context instanceof OnHomeFragmentInteractionListener) {
             mListener = (OnHomeFragmentInteractionListener) context;
         } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnHomeFragmentInteractionListener");
+            throw new RuntimeException(context.toString() + " must implement OnHomeFragmentInteractionListener");
         }
     }
 
-    // ADDED: Best practice to nullify listener on detach
     @Override
     public void onDetach() {
         super.onDetach();
@@ -93,28 +99,20 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "FlowTracker: onViewCreated -> Fragment view is created.");
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize all data lists
         categoryList = new ArrayList<>();
         dealsList = new ArrayList<>();
         trendingList = new ArrayList<>();
         bannerList = new ArrayList<>();
 
-        // Initialize UI Components
         initializeViews(view);
         setupClickListeners();
+        setupRecyclerViews(view);
+        setupBannerViewPager();
 
-        // Setup all UI components and their adapters
-        setupCategoriesRecyclerView(view);
-        setupDealsRecyclerView(view);
-        setupTrendingRecyclerView(view);
-        setupBannerViewPager(view);
-
-        // Fetch all data from Firestore
         fetchAllData();
     }
 
@@ -124,32 +122,102 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         shimmerbanner = view.findViewById(R.id.slideshow);
         shimmerCategory = view.findViewById(R.id.shimmer_ct);
         address = view.findViewById(R.id.address);
+        indicatorContainer = view.findViewById(R.id.indicatorContainer);
+        bannerViewPager = view.findViewById(R.id.bannerViewPager);
     }
 
-    private void setupClickListeners() {
-        // Address click listener
-        addressLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    // Refresh address text regardless of result
-                    fetchDefaultAddress();
+    private void setupRecyclerViews(View view) {
+        // Categories
+        categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
+        categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        categoryAdapter = new CategoryAdapter(getContext(), categoryList, this);
+        categoriesRecyclerView.setAdapter(categoryAdapter);
+
+        // Deals
+        dealsRecyclerView = view.findViewById(R.id.dealsRecyclerView);
+        dealsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        dealsAdapter = new ProductAdapter(getContext(), dealsList, R.layout.item_product, this);
+        dealsRecyclerView.setAdapter(dealsAdapter);
+
+        // Trending
+        trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView);
+        trendingRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        trendingAdapter = new ProductAdapter(getContext(), trendingList, R.layout.item_product_grid, this);
+        trendingRecyclerView.setAdapter(trendingAdapter);
+    }
+
+    private void setupBannerViewPager() {
+        bannerAdapter = new BannerAdapter(bannerList);
+        bannerViewPager.setAdapter(bannerAdapter);
+
+        bannerViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                // Purane callbacks hata kar naya start karein
+                indicatorContainer.post(() -> startBannerProgress(position));
+            }
+        });
+    }
+
+    private void startBannerProgress(int position) {
+        // 1. Purane animator ko cancel aur clear karein
+        if (progressAnimator != null) {
+            progressAnimator.removeAllUpdateListeners();
+            progressAnimator.removeAllListeners();
+            progressAnimator.cancel();
+        }
+
+        if (bannerList.isEmpty() || indicatorContainer == null || !isAdded()) return;
+
+        int activeWidth = (int) (40 * getResources().getDisplayMetrics().density);
+        int inactiveWidth = (int) (12 * getResources().getDisplayMetrics().density);
+
+        // 2. Bars ki state ko force-reset karein
+        for (int i = 0; i < indicatorContainer.getChildCount(); i++) {
+            ProgressBar bar = (ProgressBar) indicatorContainer.getChildAt(i);
+            if (bar != null) {
+                // Drawable sharing band karein
+                if (bar.getProgressDrawable() != null) {
+                    bar.getProgressDrawable().mutate();
                 }
-        );
-        address.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MyAddressesActivity.class);
-            intent.putExtra("DEFAULT_SETTER_MODE", true);
-            addressLauncher.launch(intent);
+
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) bar.getLayoutParams();
+                if (i == position) {
+                    params.width = activeWidth;
+                    bar.setProgress(0);
+                } else {
+                    params.width = inactiveWidth;
+                    bar.setProgress(i < position ? 1000 : 0);
+                }
+                bar.setLayoutParams(params);
+            }
+        }
+
+        ProgressBar currentBar = (ProgressBar) indicatorContainer.getChildAt(position);
+        if (currentBar == null) return;
+
+        // 3. Naya animator setup karein
+        progressAnimator = ValueAnimator.ofInt(0, 1000);
+        progressAnimator.setDuration(SLIDE_DURATION);
+        progressAnimator.setInterpolator(new LinearInterpolator());
+
+        progressAnimator.addUpdateListener(animation -> {
+            int val = (int) animation.getAnimatedValue();
+            currentBar.setProgress(val);
         });
 
-        // Search bar click listener (assuming R.id.search is the container)
-        View searchBarCard = getView().findViewById(R.id.search);
-        if (searchBarCard != null) {
-            searchBarCard.setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    startActivity(new Intent(getActivity(), SearchActivity.class));
+        progressAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // Page change logic tabhi chalayein jab animation poori ho
+                if (isAdded() && bannerViewPager != null && !bannerList.isEmpty()) {
+                    int nextItem = (bannerViewPager.getCurrentItem() + 1) % bannerList.size();
+                    bannerViewPager.setCurrentItem(nextItem, true);
                 }
-            });
-        }
+            }
+        });
+
+        progressAnimator.start();
     }
 
     private void fetchAllData() {
@@ -160,168 +228,174 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         fetchDefaultAddress();
     }
 
-    // --- UI Setup Methods ---
+    private void fetchBanners() {
+        db.collection("Banners").get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && isAdded()) {
+                shimmerbanner.stopShimmer();
+                shimmerbanner.setVisibility(View.GONE);
+                bannerViewPager.setVisibility(View.VISIBLE);
+                indicatorContainer.setVisibility(View.VISIBLE);
 
-    private void setupCategoriesRecyclerView(View view) {
-        categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
-        categoriesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        categoryAdapter = new CategoryAdapter(getContext(), categoryList, this);
-        categoriesRecyclerView.setAdapter(categoryAdapter);
-    }
+                bannerList.clear();
+                indicatorContainer.removeAllViews();
 
-    private void setupDealsRecyclerView(View view) {
-        dealsRecyclerView = view.findViewById(R.id.dealsRecyclerView);
-        dealsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        dealsAdapter = new ProductAdapter(getContext(), dealsList, R.layout.item_product, this);
-        dealsRecyclerView.setAdapter(dealsAdapter);
-    }
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    bannerList.add(document.toObject(Banner.class));
+                    // Inflate progress segment for each banner
+                    View v = getLayoutInflater().inflate(R.layout.layout_banner_indicator, indicatorContainer, false);
+                    indicatorContainer.addView(v);
+                }
 
-    private void setupTrendingRecyclerView(View view) {
-        trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView);
-        trendingRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        trendingAdapter = new ProductAdapter(getContext(), trendingList, R.layout.item_product_grid, this);
-        trendingRecyclerView.setAdapter(trendingAdapter);
-    }
-
-    private void setupBannerViewPager(View view) {
-        bannerViewPager = view.findViewById(R.id.bannerViewPager);
-
-        // CHANGE 3: Pass bannerList to the adapter
-        bannerAdapter = new BannerAdapter(bannerList);
-        bannerViewPager.setAdapter(bannerAdapter);
-
-        sliderRunnable = () -> {
-            if (bannerViewPager != null) {
-                bannerViewPager.setCurrentItem(bannerViewPager.getCurrentItem() + 1);
-            }
-        };
-
-        bannerViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                sliderHandler.removeCallbacks(sliderRunnable);
-                sliderHandler.postDelayed(sliderRunnable, 3000);
+                bannerAdapter.notifyDataSetChanged();
+                if (!bannerList.isEmpty()) startBannerProgress(0);
+                Log.d(TAG, "Banners found: " + bannerList.size());
+                Log.d(TAG, "Indicator container null? " + (indicatorContainer == null));
             }
         });
     }
-
-    // --- Data Fetching Methods ---
 
     private void fetchCategories() {
         db.collection("categories").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && getContext() != null) {
-                // CORRECTED: Stop shimmer outside the loop to handle empty results
+            if (task.isSuccessful() && isAdded()) {
                 shimmerCategory.stopShimmer();
                 shimmerCategory.setVisibility(View.GONE);
                 categoriesRecyclerView.setVisibility(View.VISIBLE);
-
                 categoryList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    categoryList.add(document.toObject(Category.class));
-                }
-                if (categoryAdapter != null) categoryAdapter.notifyDataSetChanged();
+                for (QueryDocumentSnapshot doc : task.getResult()) categoryList.add(doc.toObject(Category.class));
+                categoryAdapter.notifyDataSetChanged();
             }
         });
     }
 
-    private void fetchBanners() {
-        db.collection("Banners")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && getContext() != null) {
-                        shimmerbanner.stopShimmer();
-                        shimmerbanner.setVisibility(View.GONE);
-                        bannerViewPager.setVisibility(View.VISIBLE);
-
-                        bannerList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Map to Banner.class instead of Product.class
-                            Banner banner = document.toObject(Banner.class);
-                            bannerList.add(banner);
-                        }
-                        if (bannerAdapter != null) bannerAdapter.notifyDataSetChanged();
-
-                        // Restart the slider handler now that we have data
-                        if (!bannerList.isEmpty()) {
-                            sliderHandler.removeCallbacks(sliderRunnable);
-                            sliderHandler.postDelayed(sliderRunnable, 3000);
-                        }
-                    } else {
-                        Log.e(TAG, "Error fetching banners", task.getException());
-                    }
-                });
-    }
-
     private void fetchDeals() {
-        db.collection("products").limit(5).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && getContext() != null) {
-                // CORRECTED: Stop shimmer outside the loop
+        isDealsLoading = true;
+
+        // Agar list khali hai toh shimmer dikhayein (Pehle load ke liye)
+        if (dealsList.isEmpty()) {
+            shimmerdeals.startShimmer();
+            shimmerdeals.setVisibility(View.VISIBLE);
+        }
+
+        Query query = db.collection("products").limit(PAGE_SIZE);
+        if (lastDealsVisible != null) {
+            query = query.startAfter(lastDealsVisible); // Pichle batch ke baad se start karein
+        }
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
                 shimmerdeals.stopShimmer();
                 shimmerdeals.setVisibility(View.GONE);
                 dealsRecyclerView.setVisibility(View.VISIBLE);
 
-                dealsList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Product product = document.toObject(Product.class);
-                    product.setProductId(document.getId());
-                    dealsList.add(product);
+                for (QueryDocumentSnapshot doc : task.getResult()) {
+                    Product p = doc.toObject(Product.class);
+                    p.setProductId(doc.getId());
+                    dealsList.add(p);
                 }
-                if (dealsAdapter != null) dealsAdapter.notifyDataSetChanged();
+
+                if (!task.getResult().isEmpty()) {
+                    lastDealsVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
+                    dealsAdapter.notifyDataSetChanged();
+                } else {
+                    isDealsLastPage = true; // Data khatam
+                }
+            }
+            isDealsLoading = false;
+        });
+    }
+    private void setupTrendingScrollListener(View view) {
+        androidx.core.widget.NestedScrollView nestedScrollView = view.findViewById(R.id.nestedScrollView); // Apni ID check karein
+        nestedScrollView.setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
+                if (!isTrendingLoading && !isTrendingLastPage) {
+                    fetchTrendingProducts();
+                }
             }
         });
     }
 
     private void fetchTrendingProducts() {
-        db.collection("products").orderBy("stockQuantity", Query.Direction.DESCENDING).limit(6).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && getContext() != null) {
-                // CORRECTED: Stop shimmer outside the loop
+        isTrendingLoading = true;
+
+        if (trendingList.isEmpty()) {
+            shimmertrending.startShimmer();
+            shimmertrending.setVisibility(View.VISIBLE);
+        }
+
+        Query query = db.collection("products")
+                .orderBy("stockQuantity", Query.Direction.DESCENDING)
+                .limit(PAGE_SIZE);
+
+        if (lastTrendingVisible != null) {
+            query = query.startAfter(lastTrendingVisible);
+        }
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
                 shimmertrending.stopShimmer();
                 shimmertrending.setVisibility(View.GONE);
                 trendingRecyclerView.setVisibility(View.VISIBLE);
 
-                trendingList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Product product = document.toObject(Product.class);
-                    product.setProductId(document.getId());
-                    trendingList.add(product);
+                for (QueryDocumentSnapshot doc : task.getResult()) {
+                    Product p = doc.toObject(Product.class);
+                    p.setProductId(doc.getId());
+                    trendingList.add(p);
                 }
-                if (trendingAdapter != null) trendingAdapter.notifyDataSetChanged();
+
+                if (!task.getResult().isEmpty()) {
+                    lastTrendingVisible = task.getResult().getDocuments().get(task.getResult().size() - 1);
+                    trendingAdapter.notifyDataSetChanged();
+                } else {
+                    isTrendingLastPage = true;
+                }
             }
+            isTrendingLoading = false;
         });
     }
 
     private void fetchDefaultAddress() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            address.setText("No user logged in.");
-            return;
-        }
-        String userId = currentUser.getUid();
-        db.collection("users").document(userId).collection("addresses")
-                .whereEqualTo("default", true)
-                .limit(1)
-                .get()
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) { address.setText("Login to set address"); return; }
+        db.collection("users").document(user.getUid()).collection("addresses")
+                .whereEqualTo("default", true).limit(1).get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        if (task.getResult().isEmpty()) {
-                            address.setText("No default address set.");
-                        } else {
-                            QueryDocumentSnapshot document = (QueryDocumentSnapshot) task.getResult().getDocuments().get(0);
-                            Address defaultAddress = document.toObject(Address.class);
-                            address.setText("Deliver To: " + defaultAddress.toString());
-                        }
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        Address addr = task.getResult().getDocuments().get(0).toObject(Address.class);
+                        address.setText("Deliver to: " + addr.toString());
                     } else {
-                        Log.e(TAG, "Error fetching default address", task.getException());
-                        address.setText("Could not load address.");
+                        address.setText("Set Default Address");
                     }
                 });
     }
 
-    // --- Click Listener Implementation ---
+    private void setupClickListeners() {
+        addressLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> fetchDefaultAddress());
+        address.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MyAddressesActivity.class);
+            intent.putExtra("DEFAULT_SETTER_MODE", true);
+            addressLauncher.launch(intent);
+        });
+
+        View searchBar = getView().findViewById(R.id.search);
+        if (searchBar != null) searchBar.setOnClickListener(v -> startActivity(new Intent(getActivity(), SearchActivity.class)));
+    }
+    private void setupDealsScrollListener() {
+        dealsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager != null && layoutManager.findLastVisibleItemPosition() >= dealsList.size() - 2) {
+                    if (!isDealsLoading && !isDealsLastPage) {
+                        fetchDeals(); // Agla batch load karein
+                    }
+                }
+            }
+        });
+    }
+
     @Override
     public void onProductClick(Product product) {
-        if (getContext() == null) return;
         Intent intent = new Intent(getContext(), ProductDetailActivity.class);
         intent.putExtra("PRODUCT_ID", product.getProductId());
         startActivity(intent);
@@ -329,24 +403,27 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     @Override
     public void onCategoryItemClick(Category category) {
-        if (mListener != null) {
-            mListener.navigateToCategories(category.getId());
-            Log.d(TAG, "Home Fragment: sending category id to Home Activity" + category.getId());
-        }
+        if (mListener != null) mListener.navigateToCategories(category.getId());
     }
 
-    // --- Lifecycle and Runnable for Banner ---
     @Override
     public void onPause() {
         super.onPause();
-        sliderHandler.removeCallbacks(sliderRunnable);
+        if (progressAnimator != null) progressAnimator.pause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(bannerList != null && !bannerList.isEmpty()){
-            sliderHandler.postDelayed(sliderRunnable, 5000);
+        if (progressAnimator != null && progressAnimator.isPaused()) progressAnimator.resume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (progressAnimator != null) {
+            progressAnimator.cancel();
+            progressAnimator = null;
         }
     }
 }
