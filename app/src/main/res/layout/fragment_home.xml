@@ -5,14 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00FFFFFF"
+    android:background="@android:color/transparent"
     tools:context=".HomeFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#00FFFFFF"
+        android:background="@android:color/transparent"
         app:liftOnScroll="false"
         app:liftOnScrollColor="@android:color/transparent"
         android:elevation="0dp"
@@ -44,6 +44,9 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="4dp"
                     android:paddingVertical="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/layout_icons"
                     app:layout_constraintStart_toStartOf="parent"
@@ -54,6 +57,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/baseline_location_on_24"
+                        android:contentDescription="Location Pin"
                         app:tint="@color/black" />
 
                     <LinearLayout
@@ -97,6 +101,7 @@
                                 android:layout_height="18dp"
                                 android:layout_marginStart="2dp"
                                 android:src="@drawable/baseline_arrow_drop_down_24"
+                                android:contentDescription="Dropdown Arrow"
                                 app:tint="@color/white" />
                         </LinearLayout>
                     </LinearLayout>
@@ -118,6 +123,10 @@
                         android:layout_height="26dp"
                         android:layout_marginEnd="16dp"
                         android:src="@drawable/ic_cart"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Cart"
                         app:tint="@color/white" />
 
                     <ImageView
@@ -125,6 +134,10 @@
                         android:layout_width="26dp"
                         android:layout_height="26dp"
                         android:src="@drawable/bell"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Notifications"
                         app:tint="@color/white" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -134,44 +147,89 @@
             android:id="@+id/searchBarCard"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginHorizontal="10dp"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
-            app:cardBackgroundColor="#00000000"
+            android:layout_marginHorizontal="10dp"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@android:color/transparent"
             app:cardCornerRadius="10dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/gradient2"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="12dp">
+                android:background="@color/transparent"
+                android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/black" />
-
-                <TextView
-                    android:id="@+id/search"
+                <LinearLayout
                     android:layout_width="0dp"
+                    android:layout_weight="15"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/gradient2"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="12dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_search"
+                        android:contentDescription="Search Icon"
+                        app:tint="@color/black" />
+
+                    <TextView
+                        android:id="@+id/search"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="Search for Products, Brands and More"
+                        android:textColor="@color/black"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_camera"
+                        android:contentDescription="Camera Search"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/nav_home"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginStart="12dp"
-                    android:text="Search for Products, Brands and More"
-                    android:textColor="@color/black"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textSize="14sp" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="12dp"
-                    android:src="@drawable/ic_camera"
-                    app:tint="@color/black" />
+                    <ImageView
+                        android:id="@+id/btn_cart"
+                        android:layout_width="26dp"
+                        android:layout_gravity="center"
+                        android:layout_height="26dp"
+                        android:src="@drawable/wallet"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Wallet"
+                        app:tint="@color/white" />
+                    <TextView
+                    android:id="@+id/wallet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹500"
+                        android:maxLines="1"
+                        android:textStyle="bold"
+                    android:textSize="11sp"
+                    android:textColor="@color/buy_now_green" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -181,13 +239,13 @@
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#00FFFFFF"
+        android:background="@android:color/transparent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#00000000"
+            android:background="@android:color/transparent"
             android:orientation="vertical"
             android:paddingBottom="100dp">
 
@@ -237,9 +295,8 @@
                         android:layout_height="match_parent"
                         android:background="#DDDDDD" />
                 </com.facebook.shimmer.ShimmerFrameLayout>
-
-
             </FrameLayout>
+
             <LinearLayout
                 android:id="@+id/indicatorContainer"
                 android:layout_width="match_parent"
@@ -279,7 +336,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="#00000000"
+                android:background="@android:color/transparent"
                 android:visibility="gone"
                 tools:listitem="@layout/item_product" />
 

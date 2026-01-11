@@ -68,7 +68,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private com.google.firebase.firestore.DocumentSnapshot lastDealsVisible, lastTrendingVisible;
     private boolean isDealsLoading = false, isTrendingLoading = false;
     private boolean isDealsLastPage = false, isTrendingLastPage = false;
-    private static final int PAGE_SIZE = 7;
+    private static final int PAGE_SIZE = 5;
 
     // Animation Logic
     private ValueAnimator progressAnimator;
@@ -112,6 +112,9 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         setupClickListeners();
         setupRecyclerViews(view);
         setupBannerViewPager();
+
+        setupDealsScrollListener();
+        setupTrendingScrollListener(view);
 
         fetchAllData();
     }
@@ -304,14 +307,23 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         });
     }
     private void setupTrendingScrollListener(View view) {
-        androidx.core.widget.NestedScrollView nestedScrollView = view.findViewById(R.id.nestedScrollView); // Apni ID check karein
-        nestedScrollView.setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-            if (scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
-                if (!isTrendingLoading && !isTrendingLastPage) {
-                    fetchTrendingProducts();
+        androidx.core.widget.NestedScrollView nestedScrollView = view.findViewById(R.id.nestedScrollView);
+
+        if (nestedScrollView != null) {
+            nestedScrollView.setOnScrollChangeListener((androidx.core.widget.NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                // Calculate total height of the content inside the scrollview
+                int totalHeight = v.getChildAt(0).getMeasuredHeight();
+                int currentHeight = v.getMeasuredHeight();
+
+                // Check if user has scrolled to bottom (allowing a small 50px buffer)
+                if (scrollY >= (totalHeight - currentHeight - 50)) {
+                    if (!isTrendingLoading && !isTrendingLastPage) {
+                        Log.d(TAG, "Loading more trending products...");
+                        fetchTrendingProducts();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private void fetchTrendingProducts() {

@@ -1,117 +1,348 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context=".ProductDetailActivity">
 
-    <ScrollView
-        android:id="@+id/contentPanel"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/buttons_container_layout">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:elevation="4dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/white"
+            app:layout_scrollFlags="scroll|enterAlways|snap">
+
+            <RelativeLayout
+                android:id="@+id/toolbar_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/black" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toStartOf="@+id/cart_container"
+                    android:layout_toEndOf="@+id/imageView"
+                    android:background="@drawable/gradient2"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp">
+
+                    <TextView
+                        android:id="@+id/searchEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:hint="Search for Products, Brands and More"
+                        android:maxLines="1"
+                        android:gravity="center"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="#9E9E9E"
+                        android:textCursorDrawable="@null"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="12dp"
+                        android:src="@drawable/ic_camera"
+                        app:tint="@color/black" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/cart_container"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="8dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_cart"
+                        app:tint="@color/black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="14dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:background="@drawable/bg_default_tag"
+                        android:gravity="center"
+                        android:text="2"
+                        android:textColor="@android:color/white"
+                        android:textSize="8sp"
+                        android:visibility="visible" />
+                </FrameLayout>
+            </RelativeLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="60dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="16dp">
+            android:orientation="vertical"
+            android:paddingBottom="20dp">
 
-            <ImageView
-                android:id="@+id/productImageViewDetail"
-                android:layout_width="0dp"
-                android:layout_height="300dp"
-                android:scaleType="centerCrop"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:src="@tools:sample/backgrounds/scenic" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/productNameTextViewDetail"
-                android:layout_width="0dp"
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/productImagesViewPager"
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/viewPagerIndicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    app:layout_constraintBottom_toBottomOf="@id/productImagesViewPager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:tabBackground="@drawable/indicator_selector"
+                    app:tabGravity="center"
+                    android:background="@android:color/transparent"
+                    app:tabIndicatorGravity="center"
+                    app:tabIndicatorHeight="0dp"
+                    app:tabRippleColor="@null" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textAppearance="?attr/textAppearanceHeadline5"
-                app:layout_constraintTop_toBottomOf="@id/productImageViewDetail"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:text="Men's Slim Fit T-Shirt" />
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <TextView
-                android:id="@+id/productPriceTextViewDetail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="?attr/textAppearanceHeadline4"
-                android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/productNameTextViewDetail"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="16dp"
-                tools:text="₹499" />
+                <TextView
+                    android:id="@+id/productBrand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nike"
+                    android:textColor="#888888"
+                    android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/productNameTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Men's Slim Fit T-Shirt"
+                    android:textColor="@color/black"
+                    android:textSize="18sp" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+                    <TextView
+                        android:id="@+id/productPriceTextViewDetail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹499"
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/productMRP"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="₹999"
+                        android:textColor="#878787"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/productDiscount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="50% off"
+                        android:textColor="#388E3C"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/productDescriptionTextViewDetail"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                android:textAppearance="?attr/textAppearanceBody1"
-                app:layout_constraintTop_toBottomOf="@id/productPriceTextViewDetail"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:text="This is a high-quality cotton t-shirt, perfect for casual wear. It is available in multiple colors and sizes." />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#E0E0E0"/>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Product Details"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"/>
 
-    <!-- Modern and Bold Button Container -->
+                <TextView
+                    android:id="@+id/productDescriptionTextViewDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="High-quality cotton t-shirt perfect for casual wear. Available in multiple sizes. Breathable fabric ensures comfort all day long."
+                    android:textColor="#424242"
+                    android:textSize="14sp" />
+
+                <LinearLayout
+                    android:id="@+id/specificationsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Product highlights"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
     <LinearLayout
         android:id="@+id/buttons_container_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:elevation="8dp"
-        android:background="?android:attr/colorBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:elevation="16dp"
+        android:orientation="horizontal">
 
-
-        <!-- Secondary Action: Add to Cart (Outlined Style) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/addToCartButton"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+        <FrameLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Add To Cart"
-            android:paddingVertical="14dp"
-            android:layout_marginEnd="8dp"
-            app:icon="@drawable/ic_cart"
-            app:iconGravity="textStart"/>
+            android:background="@android:color/white">
 
-        <!-- Primary Action: Buy Now (Filled, Bold Style) -->
-        <com.google.android.material.button.MaterialButton
+            <TextView
+                android:id="@+id/addToCartButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:text="ADD TO CART"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/quantitySelector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="1dp"
+                android:background="@drawable/background_of_category_item"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageButton
+                    android:id="@+id/minusButton"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="12dp"
+                    android:layout_gravity="center"
+                    android:rotation="-90"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:id="@+id/quantityTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="1"
+                    android:textColor="@color/buy_now_green"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <ImageButton
+                    android:id="@+id/PlusBtn"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="12dp"
+                    android:layout_gravity="center"
+                    android:rotation="90"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/black" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <TextView
             android:id="@+id/buyNowButton"
-            style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Buy Now"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:backgroundTint="@color/buy_now_green"
-            android:paddingVertical="14dp"
-            android:layout_marginStart="8dp"
-            app:icon="@drawable/ic_buy_now"
-            app:iconGravity="textStart"/>
+            android:background="@color/buy_now_green"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="BUY NOW"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
