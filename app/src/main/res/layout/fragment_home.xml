@@ -210,7 +210,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless">
 
                     <ImageView
-                        android:id="@+id/btn_cart"
+                        android:id="@+id/btn_wallet"
                         android:layout_width="26dp"
                         android:layout_gravity="center"
                         android:layout_height="26dp"
@@ -221,14 +221,14 @@
                         android:contentDescription="Wallet"
                         app:tint="@color/white" />
                     <TextView
-                    android:id="@+id/wallet"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="₹500"
+                        android:id="@+id/wallet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹500"
                         android:maxLines="1"
                         android:textStyle="bold"
-                    android:textSize="11sp"
-                    android:textColor="@color/buy_now_green" />
+                        android:textSize="11sp"
+                        android:textColor="@color/buy_now_green" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -349,20 +349,85 @@
                 android:textStyle="bold"
                 android:textSize="18sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/trendingRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:nestedScrollingEnabled="false"
-                android:visibility="gone" />
-
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/trendingShimmerLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <include layout="@layout/item_product_grid_placeholder" />
             </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/trendingRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerBottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+
+                    <include
+                        layout="@layout/item_product_grid_placeholder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_margin="4dp"/>
+                </LinearLayout>
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <TextView
+                android:id="@+id/tvNoMoreProducts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No More Products Left"
+                android:textAlignment="center"
+                android:padding="16dp"
+                android:textSize="14sp"
+                android:textColor="#888888"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

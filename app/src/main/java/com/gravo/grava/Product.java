@@ -13,6 +13,7 @@ public class Product implements Serializable {
     private String productId;
 
     private String name;
+    private int clicks;
     private String description;
     private double price;
     private String brand;
@@ -37,10 +38,6 @@ public class Product implements Serializable {
     // This field tracks the quantity in the cart. It is not saved to Firestore
     // with the product, it's for local app state only.
     private int quantityInCart = 0;
-
-    // A no-argument constructor is required for Firestore.
-    public Product() {}
-
     // --- Getters and Setters for all fields ---
 
     public String getProductId() { return productId; }
@@ -112,5 +109,14 @@ public class Product implements Serializable {
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 '}';
+    }
+
+
+    public int getClicks() {
+        return clicks;
+    }
+
+    public void setClicks(int clicks) {
+        this.clicks = clicks;
     }
 }

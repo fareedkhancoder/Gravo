@@ -5,7 +5,7 @@
         <layer-list>
             <item android:left="4dp" android:right="4dp">
                 <shape android:shape="rectangle">
-                    <solid android:color="#000000" /> <size android:width="4dp" android:height="4dp" />
+                    <solid android:color="#000000" /> <size android:width="5dp" android:height="5dp" />
                 </shape>
             </item>
         </layer-list>
@@ -15,7 +15,7 @@
         <layer-list>
             <item android:left="4dp" android:right="4dp">
                 <shape android:shape="rectangle">
-                    <solid android:color="#CCCCCC" /> <size android:width="3dp" android:height="3dp" />
+                    <solid android:color="#85CCCCCC" /> <size android:width="3dp" android:height="3dp" />
                 </shape>
             </item>
         </layer-list>

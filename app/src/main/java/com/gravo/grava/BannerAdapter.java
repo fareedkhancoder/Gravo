@@ -15,7 +15,6 @@ import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
 
-    // CHANGE 1: अब हम Product की जगह Banner लिस्ट यूज़ कर रहे हैं
     private List<Banner> bannerList;
 
     public BannerAdapter(List<Banner> bannerList) {
@@ -31,25 +30,29 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        // Crash Prevention
         if (bannerList == null || bannerList.isEmpty()) {
             return;
         }
 
-        // Infinite Scroll Logic
+        // Infinite Scroll Calculation
         int actualPosition = position % bannerList.size();
         Banner banner = bannerList.get(actualPosition);
         Context context = holder.itemView.getContext();
 
-        // CHANGE 2: सिर्फ इमेज लोड करेंगे (Name/Price का कोड हटा दिया है)
         if (banner.getImage() != null && !banner.getImage().isEmpty()) {
             Glide.with(context)
                     .load(banner.getImage())
                     .into(holder.bannerImageView);
         } else {
-            // Placeholder अगर इमेज न हो
-            holder.bannerImageView.setImageResource(R.drawable.ic_placeholder);
+            // Make sure you have a placeholder drawable, or remove this else block
+            holder.bannerImageView.setImageResource(R.drawable.ic_launcher_background);
         }
+    }
+
+    // --- NEW METHOD: Allows HomeFragment to update banners without recreating the adapter ---
+    public void updateList(List<Banner> newBanners) {
+        this.bannerList = newBanners;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -57,6 +60,7 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
         if (bannerList == null || bannerList.isEmpty()) {
             return 0;
         }
+        // Enable infinite scrolling only if we have more than 1 item
         return bannerList.size() > 1 ? Integer.MAX_VALUE : bannerList.size();
     }
 
@@ -65,7 +69,6 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
         public BannerViewHolder(@NonNull View itemView) {
             super(itemView);
-            // CHANGE 3: सिर्फ ImageView को find कर रहे हैं
             bannerImageView = itemView.findViewById(R.id.bannerImageView);
         }
     }

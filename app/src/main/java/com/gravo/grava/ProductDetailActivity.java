@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.appbar.AppBarLayout;
@@ -25,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.gravo.grava.viewmodel.ProductViewModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +52,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     // Layout containers
     private AppBarLayout appBarLayout;
     private View toolbarContent;
+    private ProductViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +68,25 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         // 1. Initialize Views
         initViews();
+        viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
 
         // 2. Setup Toolbar Fading Effect
         setupToolbarFadeEffect();
+
+        String productId = getIntent().getStringExtra("PRODUCT_ID");
+        viewModel.monitorCartStatus(productId);
+
+        viewModel.getCartQuantity().observe(this, qty -> {
+            if (qty > 0) {
+                // Show Quantity Selector, Hide Add Button
+                addToCartBtn.setVisibility(View.GONE);
+                quantitySelector.setVisibility(View.VISIBLE);
+            } else {
+                // Show Add Button, Hide Selector
+                addToCartBtn.setVisibility(View.VISIBLE);
+                quantitySelector.setVisibility(View.GONE);
+            }
+        });
 
         // 3. Setup Firebase
         db = FirebaseFirestore.getInstance();

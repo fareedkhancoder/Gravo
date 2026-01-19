@@ -34,6 +34,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         this.clickListener = clickListener;
     }
 
+
+
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -96,6 +98,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             }
         });
     }
+    public void updateList(List<Product> newList) {
+        this.productList.clear();
+        this.productList.addAll(newList);
+        notifyDataSetChanged();
+    }
 
     @Override
     public int getItemCount() {
@@ -129,5 +136,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             quantityTextView = itemView.findViewById(R.id.quantityTextView);
             plusButton = itemView.findViewById(R.id.PlusBtn);
         }
+
+
     }
 }

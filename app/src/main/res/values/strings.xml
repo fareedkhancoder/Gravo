@@ -20,5 +20,11 @@
     <string name="quantity_format">Qty: %d</string>
     <string name="search_for_products_brands_and_more">Search for Products, Brands and More</string>
     <string name="back_button">Back Button</string>
+    <string name="deliver_to">Deliver to: %1$s</string>
+    <string name="login_to_set_address">Login to set address</string>
+    <string name="set_default_address">Set Default Address</string>
+    <string name="deals_of_day">Deals of the Day</string>
+    <string name="trending_products">Trending Products</string>
+
 
 </resources>

@@ -1,4 +1,3 @@
-// CategoryAdapter.java
 package com.gravo.grava;
 
 import android.content.Context;
@@ -16,19 +15,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     private Context context;
     private List<Category> categoryList;
-    // 1. Declare the listener variable
     private OnCategoryItemClickListener mListener;
 
-    // 2. Define the click listener interface
     public interface OnCategoryItemClickListener {
         void onCategoryItemClick(Category category);
     }
 
-    // 3. Update the constructor to accept the listener
     public CategoryAdapter(Context context, List<Category> categoryList, OnCategoryItemClickListener listener) {
         this.context = context;
         this.categoryList = categoryList;
-        this.mListener = listener; // Assign the listener
+        this.mListener = listener;
     }
 
     @NonNull
@@ -44,16 +40,22 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         holder.categoryNameTextView.setText(category.getName());
 
         Glide.with(context)
-                .load(category.getIconUrl()) // Assuming getIconUrl() is correct
+                .load(category.getIconUrl())
                 .into(holder.categoryImageView);
 
-        // 4. Set the click listener on the entire item view
         holder.itemView.setOnClickListener(v -> {
             if (mListener != null) {
-                // Pass the clicked category object back to the fragment
                 mListener.onCategoryItemClick(category);
             }
         });
+    }
+
+    // --- FIX IS HERE ---
+    // Changed List<Product> to List<Category>
+    public void updateList(List<Category> newList) {
+        this.categoryList.clear();
+        this.categoryList.addAll(newList);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -67,7 +69,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
         public CategoryViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Make sure these IDs match your R.layout.item_category XML file
             categoryImageView = itemView.findViewById(R.id.categoryImageView);
             categoryNameTextView = itemView.findViewById(R.id.categoryNameTextView);
         }

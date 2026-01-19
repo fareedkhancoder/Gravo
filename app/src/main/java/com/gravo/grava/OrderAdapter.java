@@ -23,6 +23,12 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     public interface OnOrderClickListener {
         void onOrderClick(Order order);
     }
+    // Add inside OrderAdapter.java
+    public void updateList(List<Order> newOrders) {
+        this.orderList.clear();
+        this.orderList.addAll(newOrders);
+        notifyDataSetChanged();
+    }
 
     public OrderAdapter(Context context, List<Order> orderList, OnOrderClickListener listener) {
         this.context = context;
