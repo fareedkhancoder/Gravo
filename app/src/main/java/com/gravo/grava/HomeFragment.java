@@ -130,7 +130,10 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         setupBannerPageChangeCallback();
 
         // 6. Fetch non-ViewModel data (Address)
-        fetchDefaultAddress();
+        addressLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {
+            // fetchDefaultAddress(); <-- Ye DELETE karein
+            homeViewModel.refreshAddress(); // <-- Ye ADD karein
+        });
     }
 
     private void initializeViews(View view) {
@@ -165,6 +168,29 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         dealsAdapter = new ProductAdapter(getContext(), new ArrayList<>(), R.layout.item_product, this);
         dealsRecyclerView.setAdapter(dealsAdapter);
 
+        dealsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // dx > 0 matlab user Right side scroll kar raha hai
+                if (dx > 0) {
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    if (layoutManager != null) {
+                        int visibleItemCount = layoutManager.getChildCount();
+                        int totalItemCount = layoutManager.getItemCount();
+                        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+                        // Logic: Kya hum end ke paas hain? (Total - Visible <= FirstVisible + Threshold)
+                        if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
+                            // Next batch load karo
+                            homeViewModel.loadNextDealsPage();
+                        }
+                    }
+                }
+            }
+        });
+
         // Trending
         trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView);
         trendingRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -198,6 +224,14 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
                 bannerViewPager.setVisibility(View.GONE);
                 indicatorContainer.setVisibility(View.GONE);
             }
+
+            homeViewModel.getUserAddress().observe(getViewLifecycleOwner(), userAddress -> {
+                if (userAddress != null) {
+                    address.setText("Deliver to: " + userAddress.toString()); // Ensure Address class has valid toString()
+                } else {
+                    address.setText("Set Default Address");
+                }
+            });
         });
 
         // --- Observe Categories ---
@@ -360,19 +394,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     // Keeping this local for now as it wasn't in our ViewModel plan yet
     private void fetchDefaultAddress() {
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) { address.setText("Login to set address"); return; }
 
-        db.collection("users").document(user.getUid()).collection("addresses")
-                .whereEqualTo("default", true).limit(1).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
-                        Address addr = task.getResult().getDocuments().get(0).toObject(Address.class);
-                        address.setText("Deliver to: " + addr.toString());
-                    } else {
-                        address.setText("Set Default Address");
-                    }
-                });
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.gravo.grava.Address;
 import com.gravo.grava.Banner;
 import com.gravo.grava.Category;
 import com.gravo.grava.Product;
@@ -50,20 +51,51 @@ public class HomeRepository {
     }
 
     // 3. Fetch Deals (Assuming 'is_new' or specific query)
-    public void getDeals(MutableLiveData<List<Product>> liveData) {
-        db.collection("products")
-                .whereEqualTo("is_new", true) // Example query for deals
-                .limit(10)
+    // Purana getDeals hata kar ye naya wala lagayein
+    public void getDeals(DocumentSnapshot startAfter, TrendingCallback callback) {
+        Query query = db.collection("products")
+                .orderBy("clicks", Query.Direction.DESCENDING)
+                .limit(10); // Batch size
+
+        // Pagination Logic: Agar purana data hai, toh uske aage se shuru karo
+        if (startAfter != null) {
+            query = query.startAfter(startAfter);
+        }
+
+        query.get().addOnSuccessListener(snapshots -> {
+            List<Product> list = new ArrayList<>();
+            for (QueryDocumentSnapshot doc : snapshots) {
+                Product p = doc.toObject(Product.class);
+                p.setProductId(doc.getId());
+                list.add(p);
+            }
+
+            // Aakhri document dhoondo (Next batch ke liye)
+            DocumentSnapshot lastVisible = null;
+            if (!snapshots.isEmpty()) {
+                lastVisible = snapshots.getDocuments().get(snapshots.size() - 1);
+            }
+
+            // Data wapas bhejo
+            callback.onSuccess(list, lastVisible);
+
+        }).addOnFailureListener(callback::onError);
+    }
+
+    public void getDefaultAddress(String userId, MutableLiveData<Address> liveData) {
+        db.collection("users").document(userId).collection("addresses")
+                .whereEqualTo("default", true)
+                .limit(1)
                 .get()
                 .addOnSuccessListener(snapshots -> {
-                    List<Product> list = new ArrayList<>();
-                    for (QueryDocumentSnapshot doc : snapshots) {
-                        Product p = doc.toObject(Product.class);
-                        p.setProductId(doc.getId());
-                        list.add(p);
+                    if (!snapshots.isEmpty()) {
+                        Address address = snapshots.getDocuments().get(0).toObject(Address.class);
+                        liveData.postValue(address);
+                    } else {
+                        liveData.postValue(null); // No default address found
                     }
-                    liveData.postValue(list);
-                }).addOnFailureListener(e -> Log.e(TAG, "Deals error", e));
+                })
+                .addOnFailureListener(e -> Log.e(TAG, "Address error", e));
     }
 
     // 4. Fetch Trending (With Pagination)
