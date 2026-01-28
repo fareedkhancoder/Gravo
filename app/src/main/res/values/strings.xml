@@ -25,6 +25,7 @@
     <string name="set_default_address">Set Default Address</string>
     <string name="deals_of_day">Deals of the Day</string>
     <string name="trending_products">Trending Products</string>
+    <string name="todo">TODO</string>
 
 
 </resources>

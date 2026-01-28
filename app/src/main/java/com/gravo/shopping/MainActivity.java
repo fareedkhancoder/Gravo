@@ -2,13 +2,15 @@ package com.gravo.shopping;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -16,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.gms.auth.api.identity.SignInClient;
@@ -29,7 +30,6 @@ import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.gravo.shopping.viewmodel.LoginViewModel;
-
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     // MVVM
     private LoginViewModel viewModel;
+
+
 
     // UI Components (Simple Variables)
     private MaterialButton btnGoogleLogin;
@@ -167,24 +169,41 @@ public class MainActivity extends AppCompatActivity {
 
     private void showPhoneInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Phone Number");
 
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_PHONE);
-        input.setHint("9876543210");
-        builder.setView(input);
+        // 1. Inflate the custom layout
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_phone_input, null);
+        builder.setView(dialogView);
 
-        builder.setPositiveButton("Verify", (dialog, which) -> {
-            String phone = input.getText().toString().trim();
+        // 2. Create the dialog
+        AlertDialog dialog = builder.create();
+
+        // 3. Make background transparent so rounded corners show correctly
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        }
+
+        // 4. Initialize UI elements from the custom layout
+        EditText etPhone = dialogView.findViewById(R.id.etPhoneInput);
+        View btnVerify = dialogView.findViewById(R.id.btnVerify);
+        View btnCancel = dialogView.findViewById(R.id.btnCancel);
+
+        // 5. Handle Verify Click
+        btnVerify.setOnClickListener(v -> {
+            String phone = etPhone.getText().toString().trim();
             if (!phone.isEmpty() && phone.length() == 10) {
                 startPhoneNumberVerification(phone);
+                dialog.dismiss(); // Close dialog on success
             } else {
-                Toast.makeText(MainActivity.this, "Invalid Number", Toast.LENGTH_SHORT).show();
+                etPhone.setError("Invalid Number"); // Set error on the input field directly
+                // Optional: Shake animation could go here
             }
         });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
-        builder.show();
+        // 6. Handle Cancel Click
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 
     private void startPhoneNumberVerification(String phoneNumber) {

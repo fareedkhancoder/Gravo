@@ -42,6 +42,8 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.exoplayer)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

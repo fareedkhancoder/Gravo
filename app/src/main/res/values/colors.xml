@@ -12,6 +12,12 @@
     <color name="text_dark">#333333</color>
     <color name="text_gray">#888888</color>
     <color name="transparent">#00000000</color>
+    <color name="dialog_bg_white">#FFFFFF</color>
+    <color name="dialog_text_black">#212121</color>
+    <color name="dialog_accent_sky_blue">#03A9F4</color>
+    <color name="dialog_action_red">#D32F2F</color>
+    <color name="dialog_input_hint">#9E9E9E</color>
+    <color name="dialog_input_bg">#F5F5F5</color>
 
 
 
