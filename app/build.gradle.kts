@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.gravo.grava"
+    namespace = "com.gravo.shopping"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.gravo.grava"
+        applicationId = "com.gravo.shopping"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
