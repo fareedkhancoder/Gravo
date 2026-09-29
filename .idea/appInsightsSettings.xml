@@ -17,15 +17,29 @@
             </InsightsFilterSettings>
           </value>
         </entry>
+        <entry key="Android vitals">
+          <value>
+            <InsightsFilterSettings>
+              <option name="connection">
+                <ConnectionSetting>
+                  <option name="appId" value="com.fareed.accounts" />
+                </ConnectionSetting>
+              </option>
+              <option name="signal" value="SIGNAL_UNSPECIFIED" />
+              <option name="timeIntervalDays" value="SEVEN_DAYS" />
+              <option name="visibilityType" value="ALL" />
+            </InsightsFilterSettings>
+          </value>
+        </entry>
         <entry key="Firebase Crashlytics">
           <value>
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.gravo.grava" />
-                  <option name="mobileSdkAppId" value="1:488523270574:android:f137d13bea302340e5603f" />
-                  <option name="projectId" value="gravo-d91b6" />
-                  <option name="projectNumber" value="488523270574" />
+                  <option name="appId" value="com.gravo.shopping" />
+                  <option name="mobileSdkAppId" value="1:146038497690:android:c8788a00eba27c8b5dda23" />
+                  <option name="projectId" value="grava-8b069" />
+                  <option name="projectNumber" value="146038497690" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
