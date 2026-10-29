@@ -31,14 +31,21 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
     @Override
     public void onBindViewHolder(@NonNull CheckoutViewHolder holder, int position) {
         CartItem cartItem = cartItemList.get(position);
+        if (cartItem == null) return;
         Product product = cartItem.getProduct();
 
         if (product != null) {
-            holder.productNameTextView.setText(product.getName());
-            holder.productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
-            holder.quantityTextView.setText("Qty: " + cartItem.getQuantity()); // Quantity set karein
+            if (holder.productNameTextView != null) {
+                holder.productNameTextView.setText(product.getName());
+            }
+            if (holder.productPriceTextView != null) {
+                holder.productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
+            }
+            if (holder.quantityTextView != null) {
+                holder.quantityTextView.setText("Qty: " + cartItem.getQuantity());
+            }
 
-            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+            if (holder.productImageView != null && product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
                 Glide.with(context)
                         .load(product.getImageUrls().get(0))
                         .into(holder.productImageView);
@@ -48,7 +55,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Checko
 
     @Override
     public int getItemCount() {
-        return cartItemList.size();
+        return cartItemList != null ? cartItemList.size() : 0;
     }
 
     public static class CheckoutViewHolder extends RecyclerView.ViewHolder {

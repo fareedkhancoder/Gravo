@@ -19,5 +19,14 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:includeFontPadding">false</item>
     </style>
+    <style name="ToolbarTitleStyle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">19sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.01</item>
+    </style>
+    <style name="ShapeAppearance.App.CornerSize8" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 
 </resources>

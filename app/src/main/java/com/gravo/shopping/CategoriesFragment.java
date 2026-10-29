@@ -17,37 +17,36 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.gravo.shopping.data.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriesFragment extends Fragment implements ProductAdapter.OnProductClickListener, CategorySideAdapter.OnCategorySideClickListener {
 
-    // Arguments
     private static final String ARG_CATEGORY_ID = "category_id";
-    private String mCategoryId; // The ID received from HomeFragment, can be null
+    private String mCategoryId;
 
-    // Views
     private RecyclerView rvCategories;
     private RecyclerView rvProducts;
 
-    // Adapters
     private CategorySideAdapter categorySideAdapter;
     private ProductAdapter productAdapter;
 
-    // Data
     private List<Category> categoryList = new ArrayList<>();
     private List<Product> productList = new ArrayList<>();
-    private FirebaseFirestore db;
+    private ProductRepository repository;
 
-    // State
-    private int selectedCategoryPosition = 0; // Default to the first item
+    private int selectedCategoryPosition = 0;
 
-    public CategoriesFragment() {
-        // Required empty public constructor
-    }
+    // 🌟 PAGINATION STATE VARIABLES
+    private static final int PAGE_SIZE = 10;
+    private DocumentSnapshot lastVisibleDoc = null;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+
+    public CategoriesFragment() {}
 
     public static CategoriesFragment newInstance(String categoryId) {
         CategoriesFragment fragment = new CategoriesFragment();
@@ -60,16 +59,14 @@ public class CategoriesFragment extends Fragment implements ProductAdapter.OnPro
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = FirebaseFirestore.getInstance();
         if (getArguments() != null) {
             mCategoryId = getArguments().getString(ARG_CATEGORY_ID);
-            Log.d(TAG, "CategoriesFragment onCreate: received categoryId: " + mCategoryId);
         }
+        repository = new ProductRepository(requireContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_categories, container, false);
     }
 
@@ -77,7 +74,6 @@ public class CategoriesFragment extends Fragment implements ProductAdapter.OnPro
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize views
         rvCategories = view.findViewById(R.id.rv_categories);
         rvProducts = view.findViewById(R.id.rv_products);
 
@@ -86,124 +82,149 @@ public class CategoriesFragment extends Fragment implements ProductAdapter.OnPro
     }
 
     private void setupRecyclerViews() {
-        // 1. Setup for the left-side category list
         rvCategories.setLayoutManager(new LinearLayoutManager(getContext()));
         categorySideAdapter = new CategorySideAdapter(getContext(), categoryList, this);
         rvCategories.setAdapter(categorySideAdapter);
 
-        // 2. Setup for the right-side product grid
-        rvProducts.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2 columns in the grid
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        rvProducts.setLayoutManager(gridLayoutManager);
         productAdapter = new ProductAdapter(getContext(), productList, R.layout.item_product_grid, this);
         rvProducts.setAdapter(productAdapter);
-    }
 
-    /**
-     * Fetches the complete list of categories from Firestore.
-     * After fetching, it determines which category to select and then fetches its products.
-     */
-    private void fetchCategories() {
-        db.collection("categories")
-                .orderBy("name") // Optional: sort categories alphabetically
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    categoryList.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        categoryList.add(document.toObject(Category.class));
-                    }
+        // 🌟 INFINITE SCROLL LISTENER FOR PRODUCTS
+        rvProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
 
-                    if (categoryList.isEmpty()) {
-                        Log.w(TAG, "No categories found in Firestore.");
-                        return;
-                    }
+                if (dy > 0) { // Sirf down scroll par check karein
+                    int visibleItemCount = gridLayoutManager.getChildCount();
+                    int totalItemCount = gridLayoutManager.getItemCount();
+                    int firstVisibleItemPosition = gridLayoutManager.findFirstVisibleItemPosition();
 
-                    // First, update the adapter with the full list of categories
-                    categorySideAdapter.notifyDataSetChanged();
-
-                    // Determine which category should be selected initially
-                    int initialPosition = 0; // Default to the first item
-                    if (mCategoryId != null) {
-                        for (int i = 0; i < categoryList.size(); i++) {
-                            if (categoryList.get(i).getId().equals(mCategoryId)) {
-                                initialPosition = i;
-                                break;
-                            }
+                    if (!isLoading && !isLastPage) {
+                        if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                                && firstVisibleItemPosition >= 0
+                                && totalItemCount >= PAGE_SIZE) {
+                            loadMoreProducts();
                         }
                     }
-
-                    // Now, set the selected position in the adapter to trigger the visual highlight
-                    this.selectedCategoryPosition = initialPosition;
-                    categorySideAdapter.setSelectedPosition(initialPosition);
-
-                    // For reliability, post the scroll command to run after the layout is complete
-                    int finalInitialPosition = initialPosition;
-                    rvCategories.post(() -> rvCategories.scrollToPosition(finalInitialPosition));
-
-                    // Finally, fetch products for the initially selected category
-                    String initialCategoryId = categoryList.get(initialPosition).getId();
-                    fetchProductsForCategory(initialCategoryId);
-
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error fetching categories", e);
-                    Toast.makeText(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
-                });
+                }
+            }
+        });
     }
 
-    /**
-     * Fetches all products that belong to a specific category ID.
-     * @param categoryId The unique ID of the category to fetch products for.
-     */
-    private void fetchProductsForCategory(String categoryId) {
-        // TODO: Show a progress bar or shimmer effect here
-        db.collection("products")
-                .whereEqualTo("categoryId", categoryId)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    productList.clear();
-                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                        productList.add(document.toObject(Product.class));
+    private void fetchCategories() {
+        repository.getCategories(new ProductRepository.CategoriesCallback() {
+            @Override
+            public void onSuccess(List<Category> categories) {
+                categoryList.clear();
+                categoryList.addAll(categories);
+
+                if (categoryList.isEmpty()) {
+                    Log.w(TAG, "No categories found.");
+                    return;
+                }
+
+                categorySideAdapter.notifyDataSetChanged();
+
+                int initialPosition = 0;
+                if (mCategoryId != null) {
+                    for (int i = 0; i < categoryList.size(); i++) {
+                        if (categoryList.get(i).getId().equals(mCategoryId)) {
+                            initialPosition = i;
+                            break;
+                        }
                     }
-                    // Update the product adapter with the new list
-                    productAdapter.notifyDataSetChanged();
-                    Log.d(TAG, "Found " + productList.size() + " products for category " + categoryId);
-                    // TODO: Hide progress bar here
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error fetching products for category " + categoryId, e);
-                    // TODO: Hide progress bar here and show an error message
-                });
+                }
+
+                selectedCategoryPosition = initialPosition;
+                categorySideAdapter.setSelectedPosition(initialPosition);
+
+                int finalInitialPosition = initialPosition;
+                rvCategories.post(() -> rvCategories.scrollToPosition(finalInitialPosition));
+
+                String initialCategoryId = categoryList.get(initialPosition).getId();
+                fetchProductsForCategory(initialCategoryId);
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Log.e(TAG, "Error fetching categories", error);
+                Toast.makeText(getContext(), "Failed to load categories", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    // 🌟 INITIAL PAGE LOAD (RESET STATE)
+    private void fetchProductsForCategory(String categoryId) {
+        lastVisibleDoc = null;
+        isLastPage = false;
+        isLoading = true;
+        productList.clear();
+        productAdapter.notifyDataSetChanged();
 
-    /**
-     * This is called when a user clicks a category in the left-side list.
-     */
+        repository.getProductsByCategoryPaginated(categoryId, null, PAGE_SIZE, new ProductRepository.PaginatedProductsCallback() {
+            @Override
+            public void onSuccess(List<Product> products, DocumentSnapshot lastDoc, boolean isEnd) {
+                isLoading = false;
+                productList.addAll(products);
+                lastVisibleDoc = lastDoc;
+                isLastPage = isEnd;
+                productAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                isLoading = false;
+                Log.e(TAG, "Error fetching products for category " + categoryId, e);
+            }
+        });
+    }
+
+    // 🌟 LOAD NEXT 10 PRODUCTS ON SCROLL
+    private void loadMoreProducts() {
+        if (categoryList.isEmpty() || selectedCategoryPosition >= categoryList.size()) return;
+
+        isLoading = true;
+        String currentCategoryId = categoryList.get(selectedCategoryPosition).getId();
+
+        repository.getProductsByCategoryPaginated(currentCategoryId, lastVisibleDoc, PAGE_SIZE, new ProductRepository.PaginatedProductsCallback() {
+            @Override
+            public void onSuccess(List<Product> products, DocumentSnapshot lastDoc, boolean isEnd) {
+                isLoading = false;
+                if (!products.isEmpty()) {
+                    int startPos = productList.size();
+                    productList.addAll(products);
+                    lastVisibleDoc = lastDoc;
+                    productAdapter.notifyItemRangeInserted(startPos, products.size());
+                }
+                isLastPage = isEnd;
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                isLoading = false;
+                Log.e(TAG, "Error loading more products", e);
+            }
+        });
+    }
+
     @Override
     public void onCategorySideClick(int position) {
-        // Update the adapter to highlight the new selection
         categorySideAdapter.setSelectedPosition(position);
-        Log.d(TAG, "onCategorySideClick: position" + position);
-        this.selectedCategoryPosition = position; // Keep the fragment's state in sync
+        this.selectedCategoryPosition = position;
 
-        Log.d(TAG, "onCategorySideClick: " + selectedCategoryPosition);
-
-        // Get the ID of the newly clicked category
         Category selectedCategory = categoryList.get(position);
-        Log.d(TAG, "onCategorySideClick: " + selectedCategory.getId());
-
-        // Fetch products for this new category
         fetchProductsForCategory(selectedCategory.getId());
     }
 
-
-    /**
-     * This is called when a user clicks a product in the right-side grid.
-     */
     @Override
     public void onProductClick(Product product) {
         if (getContext() == null) return;
         Intent intent = new Intent(getContext(), ProductDetailActivity.class);
         intent.putExtra("PRODUCT_ID", product.getProductId());
+        repository.recordProductClick(product.getProductId());
         startActivity(intent);
     }
 }

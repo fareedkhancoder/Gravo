@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Gravo</string>
     <string name="default_web_client_id">488523270574-8mb2shqk2o7fjhjls8at9h5udi3jl0sf.apps.googleusercontent.com</string>
-    <color name="buy_now_green">#4CAF50</color>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="full_name_required">Full Name (Required)</string>
@@ -17,7 +16,7 @@
     <string name="save_address">Save Address</string>
     <string name="price_format_from">From ₹%.0f</string>
     <string name="price_format">₹%.2f</string>
-    <string name="quantity_format">Qty: %d</string>
+    <string name="quantity_format">%d</string>
     <string name="search_for_products_brands_and_more">Search for Products, Brands and More</string>
     <string name="back_button">Back Button</string>
     <string name="deliver_to">Deliver to: %1$s</string>
@@ -26,6 +25,58 @@
     <string name="deals_of_day">Deals of the Day</string>
     <string name="trending_products">Trending Products</string>
     <string name="todo">TODO</string>
+    <string name="select_delivery_address">Select delivery address</string>
+    <string name="search_address_hint">Search by name, area, street, pincode</string>
+    <string name="use_my_current_location">Use my current location</string>
+    <string name="allow_access_to_location">Allow access to location</string>
+    <string name="add_new_address">Add New</string>
+    <string name="saved_addresses">Saved addresses</string>
+    <string name="selected">Selected</string>
+    <string name="close">Close</string>
+    <string name="more_options">More options</string>
+    <string name="google_maps_key">AIzaSyAfuleeRrABraC-ffuovBmWOSxbJvWBazg</string>
+    <string name="laptops">Laptops</string>
+    <string name="gravo_cart_title">Your cart</string>
+    <string name="gravo_cart_deliver_to">DELIVER TO</string>
+    <string name="gravo_cart_choose_address">Select delivery address</string>
+    <string name="gravo_cart_choose">Choose</string>
+    <string name="gravo_cart_delivery_address_content_description">Delivery address</string>
+    <string name="gravo_cart_choose_address_content_description">Choose a delivery address</string>
+    <string name="gravo_cart_delivery_type">Delivery type</string>
+    <string name="gravo_cart_instant">Instant</string>
+    <string name="gravo_cart_instant_subtitle">Fast, where available</string>
+    <string name="gravo_cart_normal">Normal</string>
+    <string name="gravo_cart_normal_subtitle">Choose a delivery slot</string>
+    <string name="gravo_cart_instant_delivery_content_description">Choose instant delivery</string>
+    <string name="gravo_cart_normal_delivery_content_description">Choose normal delivery</string>
+    <string name="gravo_cart_free_delivery_default">Free delivery eligibility is checked for your address</string>
+    <string name="gravo_cart_free_delivery_progress_content_description">Progress towards free delivery</string>
+    <string name="gravo_cart_coupon_title">Have a coupon?</string>
+    <string name="gravo_cart_coupon_subtitle">Apply an offer to this order</string>
+    <string name="gravo_cart_apply">Apply</string>
+    <string name="gravo_cart_apply_coupon_content_description">Apply a coupon or promotional code</string>
+    <string name="gravo_cart_subtotal">Subtotal</string>
+    <string name="gravo_cart_discount">Discount</string>
+    <string name="gravo_cart_delivery_fee">Delivery fee</string>
+    <string name="gravo_cart_estimated_total">Estimated total</string>
+    <string name="gravo_cart_amount_pending">—</string>
+    <string name="gravo_cart_checkout_disclaimer">Review final charges on the next screen.</string>
+    <string name="gravo_cart_continue_checkout">Continue to checkout</string>
+    <string name="gravo_cart_continue_checkout_content_description">Review your cart and continue to checkout</string>
+    <string name="gravo_cart_product_image_content_description">Product image</string>
+    <string name="gravo_cart_remove_item_content_description">Remove item from cart</string>
+    <string name="gravo_cart_remove">Remove</string>
+    <string name="gravo_cart_decrease_quantity">Decrease item quantity</string>
+    <string name="gravo_cart_increase_quantity">Increase item quantity</string>
+    <string name="gravo_cart_save">Save</string>
+    <string name="gravo_cart_line_total">Line total</string>
+    <string name="gravo_cart_save_for_later_content_description">Save item for later</string>
+    <string name="gravo_cart_empty_title">Your cart is waiting</string>
+    <string name="gravo_cart_empty_message">Explore Gravo and add the products you need. They will appear here.</string>
+    <string name="gravo_cart_continue_shopping">Continue shopping</string>
+    <string name="gravo_cart_load_error_title">Unable to load your cart</string>
+    <string name="gravo_cart_load_error_message">Check your connection and try again.</string>
+    <string name="gravo_cart_retry">Try again</string>
 
 
 </resources>

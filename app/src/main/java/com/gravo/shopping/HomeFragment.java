@@ -10,9 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -27,8 +29,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.gravo.shopping.viewmodel.HomeViewModel;
 
 import java.util.ArrayList;
@@ -39,6 +39,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     // Interface for Activity communication
     public interface OnHomeFragmentInteractionListener {
         void navigateToCategories(String categoryId);
+        void navigateToCart();
     }
 
     private OnHomeFragmentInteractionListener mListener;
@@ -50,7 +51,8 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     // UI Components
     private RecyclerView categoriesRecyclerView, dealsRecyclerView, trendingRecyclerView;
     private ShimmerFrameLayout shimmertrending, shimmerdeals, shimmerbanner, shimmerCategory, shimmerBottom;
-    private TextView address;
+    private TextView address, timeSlot;
+    private ImageView btnCart, btnNotification;
     private ViewPager2 bannerViewPager;
     private LinearLayout indicatorContainer;
 
@@ -64,10 +66,9 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
     private ValueAnimator progressAnimator;
 
     // Address & Search
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db; // Kept only for Address logic temporarily
     private ActivityResultLauncher<Intent> addressLauncher;
     private TextView tvNoMoreProducts;
+    private boolean addressPromptShown;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -96,9 +97,6 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         super.onViewCreated(view, savedInstanceState);
 
         // Initialize Firebase (Only for Address/Auth)
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-
         // 1. Initialize Views
         initializeViews(view);
 
@@ -107,17 +105,72 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
         // 3. Initialize ViewModel (The Brains 🧠)
         homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        observeViewModel(); // Saare LiveData observe karna shuru karein
+        homeViewModel.startDataLoad(); // Data fetch karna start karein
 
         // 4. Start Observing Data (The Magic ✨)
-        observeViewModel();
-        homeViewModel.getIsEndOfList().observe(getViewLifecycleOwner(), isEnd -> {
-            if (isEnd) {
-                // Stop Shimmer and Show Message
-                shimmerBottom.stopShimmer();
-                shimmerBottom.setVisibility(View.GONE);
-                tvNoMoreProducts.setVisibility(View.VISIBLE);
+        homeViewModel.getRequireLoginEvent().observe(getViewLifecycleOwner(), requireLogin -> {
+            if (requireLogin != null && requireLogin) {
+
+                // 1. Toast dikhayein
+                android.widget.Toast.makeText(requireContext(), "Login again to browse", android.widget.Toast.LENGTH_SHORT).show();
+
+                // 2. MainActivity par bhej dein
+                android.content.Intent intent = new android.content.Intent(requireContext(), MainActivity.class);
+                // Ye flags purani back-history clear kar denge taaki user back press karke wapas Home par na aa paye
+                intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                requireActivity().finish();
             }
         });
+
+        homeViewModel.getAddressNotFoundEvent().observe(getViewLifecycleOwner(), isNotFound -> {
+            if (Boolean.TRUE.equals(isNotFound)) {
+                android.content.Intent intent = new android.content.Intent(requireContext(), AddEditAddressActivity.class);
+                startActivity(intent);
+                requireActivity().finish();
+            }
+        });
+        homeViewModel.getCurrentAddress().observe(getViewLifecycleOwner(), currentAddr -> {
+            if (currentAddr != null) {
+                StringBuilder builder = new StringBuilder("Deliver to: ");
+
+                // 1. Street / Area (Lower level)
+                if (currentAddr.getStreet() != null && !currentAddr.getStreet().trim().isEmpty()) {
+                    builder.append(currentAddr.getStreet()).append(", ");
+                }
+
+                // 2. City
+                if (currentAddr.getCity() != null && !currentAddr.getCity().trim().isEmpty()) {
+                    builder.append(currentAddr.getCity()).append(", ");
+                }
+
+                // 3. State
+                if (currentAddr.getState() != null && !currentAddr.getState().trim().isEmpty()) {
+                    builder.append(currentAddr.getState());
+                }
+
+                // 4. Pincode (Higher level)
+                if (currentAddr.getPincode() != null && !currentAddr.getPincode().trim().isEmpty()) {
+                    builder.append(" - ").append(currentAddr.getPincode());
+                }
+
+                address.setText(builder.toString());
+            }
+
+            requireActivity().getSupportFragmentManager().setFragmentResultListener(
+                    "ADDRESS_UPDATED_KEY",
+                    getViewLifecycleOwner(),
+                    (requestKey, result) -> {
+                        // Jaise hi signal milega, ye code run hoga
+                        // ViewModel ko data wapas fetch karne ke liye bolein
+                        if (homeViewModel != null) {
+                            homeViewModel.refreshData(); // Ye aapke page ko smoothly naye data ke sath load kar dega
+                        }
+                    }
+            );
+        });
+
 
 
         // 5. Setup Listeners (Clicks & Scrolls)
@@ -126,11 +179,10 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         setupBannerPageChangeCallback();
 
         // 6. Fetch non-ViewModel data (Address)
-        addressLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> {
-            // fetchDefaultAddress(); <-- Ye DELETE karein
-            homeViewModel.refreshAddress(); // <-- Ye ADD karein
-        });
+        addressLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                r -> homeViewModel.refreshData());
     }
+
 
     private void initializeViews(View view) {
         shimmertrending = view.findViewById(R.id.trendingShimmerLayout);
@@ -140,8 +192,12 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         shimmerBottom = view.findViewById(R.id.shimmerBottom);
 
         address = view.findViewById(R.id.address);
+        timeSlot = view.findViewById(R.id.timeSlot);
         indicatorContainer = view.findViewById(R.id.indicatorContainer);
         bannerViewPager = view.findViewById(R.id.bannerViewPager);
+        btnCart = view.findViewById(R.id.btn_cart);
+        btnNotification = view.findViewById(R.id.btn_notification);
+
 
         // Start shimmers immediately
         shimmerbanner.startShimmer();
@@ -150,6 +206,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         shimmertrending.startShimmer();
         tvNoMoreProducts = view.findViewById(R.id.tvNoMoreProducts);
     }
+
 
     private void setupRecyclerViews(View view) {
         // Categories
@@ -163,29 +220,6 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
         dealsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         dealsAdapter = new ProductAdapter(getContext(), new ArrayList<>(), R.layout.item_product, this);
         dealsRecyclerView.setAdapter(dealsAdapter);
-
-        dealsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                // dx > 0 matlab user Right side scroll kar raha hai
-                if (dx > 0) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    if (layoutManager != null) {
-                        int visibleItemCount = layoutManager.getChildCount();
-                        int totalItemCount = layoutManager.getItemCount();
-                        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                        // Logic: Kya hum end ke paas hain? (Total - Visible <= FirstVisible + Threshold)
-                        if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount) {
-                            // Next batch load karo
-                            homeViewModel.loadNextDealsPage();
-                        }
-                    }
-                }
-            }
-        });
 
         // Trending
         trendingRecyclerView = view.findViewById(R.id.trendingRecyclerView);
@@ -221,13 +255,18 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
                 indicatorContainer.setVisibility(View.GONE);
             }
 
-            homeViewModel.getUserAddress().observe(getViewLifecycleOwner(), userAddress -> {
-                if (userAddress != null) {
-                    address.setText("Deliver to: " + userAddress.toString()); // Ensure Address class has valid toString()
-                } else {
-                    address.setText("Set Default Address");
-                }
-            });
+        });
+        homeViewModel.getTimeSlotLiveData().observe(getViewLifecycleOwner(), slotText -> {
+            if (slotText != null && timeSlot != null) {
+                timeSlot.setText(slotText);
+            }
+        });
+        homeViewModel.getUnserviceablePincodeEvent().observe(getViewLifecycleOwner(), isUnserviceable -> {
+            if (isUnserviceable != null && isUnserviceable) {
+                address.setText("Address is not serviceable for this pincode.");
+                Toast.makeText(requireContext(), "We do not deliver to this pincode yet. Please change location.", Toast.LENGTH_LONG).show();
+                // Optional: User ko direct Address Change dialog/screen par bhej sakte hain
+            }
         });
 
         // --- Observe Categories ---
@@ -283,7 +322,7 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
                     // 🛑 CRITICAL FIX: Check 'isEndOfList' BEFORE showing shimmer
                     // If we are at the end, 'isEnd' will be true, so we SKIP this block.
-                    Boolean isEnd = homeViewModel.getIsEndOfList().getValue();
+                    Boolean isEnd = homeViewModel.getIsEndOfTrending().getValue();
 
                     if (isEnd == null || !isEnd) {
                         // Only show shimmer if there are potentially more products
@@ -377,20 +416,29 @@ public class HomeFragment extends Fragment implements ProductAdapter.OnProductCl
 
     // --- Helper Logic (Address, Clicks) ---
     private void setupClickListeners() {
-        addressLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), r -> fetchDefaultAddress());
         address.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MyAddressesActivity.class);
-            intent.putExtra("DEFAULT_SETTER_MODE", true);
-            addressLauncher.launch(intent);
+            openAddressPicker();
+        });
+        btnCart.setOnClickListener(v -> {
+            if (mListener != null) {
+                mListener.navigateToCart();
+            }
+        });
+        btnNotification.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), NotificationActivity.class));
         });
 
         View searchBar = getView().findViewById(R.id.search);
         if (searchBar != null) searchBar.setOnClickListener(v -> startActivity(new Intent(getActivity(), SearchActivity.class)));
     }
 
-    // Keeping this local for now as it wasn't in our ViewModel plan yet
-    private void fetchDefaultAddress() {
+    private void openAddressPicker() {
+        // Purani lines (addressLauncher wali) yaha se hata dena
 
+        AddressBottomSheetFragment bottomSheet = new AddressBottomSheetFragment();
+
+        // Is line se ye sheet, app ke navigation bar ke upar overlay hogi bina nayi Activity banaye.
+        bottomSheet.show(requireActivity().getSupportFragmentManager(), "AddressBottomSheet");
     }
 
     @Override

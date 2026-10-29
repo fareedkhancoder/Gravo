@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { createHash } from "crypto";
 
 initializeApp();
@@ -61,16 +62,14 @@ type OrderItemSnapshot = {
   lineTotalPaise: number;
 };
 
-type CreateOrderResult = {
-  alreadyExists: boolean;
-  orderId: string;
-  subtotalPaise: number;
-  grandTotalPaise: number;
-  paymentMethod: "COD";
-  paymentStatus: "PENDING" | "PAID";
-  orderStatus: "CONFIRMED" | "DELIVERED" | "CANCELLED" | "UNKNOWN";
-  stockStatus: "RESERVED" | "SOLD" | "RELEASED" | "UNKNOWN";
+type CartProduct = {
+  productId: string;
+  quantity: number;
 };
+
+function isFiniteNonNegativeNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
 
 /**
  * ============================================================
@@ -178,14 +177,20 @@ export const createOrder = onCall(
     enforceAppCheck: true,
   },
 
-  async (request): Promise<CreateOrderResult & {
+  async (request): Promise<{
     success: true;
+    alreadyExists: boolean;
+    orderId: string;
+    paymentMethod: "COD";
+    paymentStatus: "PENDING" | "PAID";
+    orderStatus: "CONFIRMED" | "DELIVERED" | "CANCELLED" | "UNKNOWN";
     amountPaise: number;
-    stockStatus: "RESERVED";
+    stockStatus: "RESERVED" | "SOLD" | "RELEASED" | "UNKNOWN";
     payment: {
       provider: "COD";
       gatewayOrderId: null;
     };
+
   }> => {
     /**
      * ----------------------------------------------------------
@@ -757,5 +762,74 @@ export const createOrder = onCall(
         "Unable to create order.",
       );
     }
+  },
+);
+
+/**
+ * Keeps the aggregate cart eligibility flag server-owned.
+ * The Android client only writes products; it never writes
+ * IsEligibleForFreeDelivery.
+ */
+export const updateCartFreeDeliveryEligibility = onDocumentWritten(
+  {
+    document: "users/{userId}/cart/cart",
+    region: FUNCTION_REGION,
+  },
+  async (event) => {
+    const after = event.data?.after;
+    if (!after || !after.exists) return;
+
+    const cart = after.data() ?? {};
+    const pincode = cart.pincode;
+    if (typeof pincode !== "string" || pincode.trim().length === 0) {
+      if (cart.IsEligibleForFreeDelivery !== false) {
+        await after.ref.set({
+          IsEligibleForFreeDelivery: false,
+        }, {merge: true});
+      }
+      return;
+    }
+
+    const analyticsSnapshot = await db.collection("analytics")
+      .doc(`pincode-${pincode.trim()}`)
+      .get();
+    const threshold = analyticsSnapshot.data()?.FREE_DELIVERY_THRESHOLD;
+    if (!analyticsSnapshot.exists || !isFiniteNonNegativeNumber(threshold)) {
+      if (cart.IsEligibleForFreeDelivery !== false) {
+        await after.ref.set({
+          IsEligibleForFreeDelivery: false,
+        }, {merge: true});
+      }
+      return;
+    }
+
+    const rawProducts = cart.products;
+    const products: CartProduct[] = Array.isArray(rawProducts)
+      ? rawProducts.filter((item): item is CartProduct =>
+        isPlainObject(item) &&
+        typeof item.productId === "string" &&
+        isSafePositiveInteger(item.quantity),
+      )
+      : [];
+
+    let profit = 0;
+    for (const item of products) {
+      const inventorySnapshot = await db.collection("productInventory")
+        .doc(item.productId)
+        .get();
+      const inventory = inventorySnapshot.data();
+      const price = inventory?.price;
+      const costPrice = inventory?.costPrice;
+      if (isFiniteNonNegativeNumber(price) && isFiniteNonNegativeNumber(costPrice)) {
+        profit += Math.max(price - costPrice, 0) * item.quantity;
+      }
+    }
+
+    const eligible = profit >= threshold;
+    if (cart.IsEligibleForFreeDelivery === eligible) return;
+
+    await after.ref.set({
+      IsEligibleForFreeDelivery: eligible,
+    }, {merge: true});
   },
 );

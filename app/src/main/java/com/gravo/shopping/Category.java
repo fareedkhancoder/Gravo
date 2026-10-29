@@ -4,11 +4,6 @@ import androidx.annotation.NonNull;
 import com.google.firebase.firestore.DocumentId;
 
 public class Category {
-
-    /**
-     * This field will be AUTOMATICALLY filled with the document's unique ID
-     * (e.g., "RlnkHyAZyIpWMLhtMWFh") by Firestore because of the @DocumentId annotation.
-     */
     @DocumentId
     private String id;
 

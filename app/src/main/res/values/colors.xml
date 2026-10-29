@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="buy_now_green">#3cb371</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="green">#00FF00</color>
@@ -18,7 +19,22 @@
     <color name="dialog_action_red">#D32F2F</color>
     <color name="dialog_input_hint">#9E9E9E</color>
     <color name="dialog_input_bg">#F5F5F5</color>
-
-
-
+    <color name="instagram_black">#111111</color>
+    <color name="instagram_gray">#777777</color>
+    <color name="instagram_light">#F1F2F6</color>
+    <color name="instagram_red">#F0445E</color>
+    <color name="gravo_cart_blue">#1769D2</color>
+    <color name="gravo_cart_blue_dark">#124D9A</color>
+    <color name="gravo_cart_blue_tint">#EAF3FF</color>
+    <color name="gravo_cart_on_blue">#FFFFFF</color>
+    <color name="gravo_cart_background">#F5F8FC</color>
+    <color name="gravo_cart_surface">#FFFFFF</color>
+    <color name="gravo_cart_border">#DCE6F2</color>
+    <color name="gravo_cart_divider">#E8EEF6</color>
+    <color name="gravo_cart_text_primary">#172B4D</color>
+    <color name="gravo_cart_text_secondary">#697B93</color>
+    <color name="gravo_cart_muted">#91A0B5</color>
+    <color name="gravo_cart_success">#16845B</color>
+    <color name="gravo_cart_progress_track">#C9DDF7</color>
+    <color name="gravo_cart_image_background">#F0F5FB</color>
 </resources>

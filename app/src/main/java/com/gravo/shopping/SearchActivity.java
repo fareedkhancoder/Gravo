@@ -24,8 +24,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.gravo.shopping.data.repository.ProductRepository;
+import com.gravo.shopping.MyApplication;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +35,6 @@ import java.util.Set;
 
 public class SearchActivity extends AppCompatActivity implements ProductAdapter.OnProductClickListener {
 
-    private FirebaseFirestore db;
     private EditText searchEditText;
     private RecyclerView searchResultsRecyclerView;
     private ProductAdapter productAdapter;
@@ -72,7 +71,6 @@ public class SearchActivity extends AppCompatActivity implements ProductAdapter.
             return insets;
         });
 
-        db = FirebaseFirestore.getInstance();
         sharedPreferences = getSharedPreferences(SEARCH_HISTORY, MODE_PRIVATE);
 
         ImageView back_btn = findViewById(R.id.back_btn);
@@ -181,21 +179,12 @@ public class SearchActivity extends AppCompatActivity implements ProductAdapter.
 
         List<String> searchKeywords = Arrays.asList(query.toLowerCase().split("\\s+"));
 
-        db.collection("products")
-                .whereArrayContainsAny("tags_lowercase", searchKeywords)
-                .get()
-                .addOnCompleteListener(task -> {
-                    searchProgressBar.setVisibility(View.GONE);
-                    if (task.isSuccessful()) {
+        MyApplication.getProductRepository().searchProducts(searchKeywords, new ProductRepository.ProductsCallback() {
+                    @Override public void onSuccess(List<Product> products) {
                         List<SearchResult> rankedResults = new ArrayList<>();
-
-                        // Step 1: Har product ko score dein
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Product product = document.toObject(Product.class);
-                            product.setProductId(document.getId());
-
+                        for (Product product : products) {
                             int score = 0;
-                            List<String> tags = (List<String>) document.get("tags_lowercase");
+                            List<String> tags = product.getTagsLowercase();
                             if (tags != null) {
                                 for (String keyword : searchKeywords) {
                                     if (tags.contains(keyword)) {
@@ -206,10 +195,7 @@ public class SearchActivity extends AppCompatActivity implements ProductAdapter.
                             rankedResults.add(new SearchResult(product, score));
                         }
 
-                        // Step 2: Results ko score ke hisab se sort karein
                         Collections.sort(rankedResults, (o1, o2) -> Integer.compare(o2.score, o1.score));
-
-                        // Step 3: Sorted list ko display ke liye taiyar karein
                         searchResultsList.clear();
                         for (SearchResult result : rankedResults) {
                             searchResultsList.add(result.product);
@@ -217,10 +203,12 @@ public class SearchActivity extends AppCompatActivity implements ProductAdapter.
 
                         productAdapter.notifyDataSetChanged();
                         if (searchResultsList.isEmpty()) {
-                            Toast.makeText(this, "No products found for '" + query + "'", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Log.w(TAG, "Error getting documents: ", task.getException());
+                        searchProgressBar.setVisibility(View.GONE);
+                    }
+                    @Override public void onFailure(Exception error) {
+                        searchProgressBar.setVisibility(View.GONE);
+                        Log.w(TAG, "Error searching products", error);
                     }
                 });
     }

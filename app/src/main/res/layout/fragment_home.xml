@@ -84,16 +84,25 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:singleLine="true"
+                                android:text="Delivered By: "
+                                android:textColor="@color/dialog_accent_sky_blue"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
 
                             <TextView
-                                android:id="@+id/tv_delivery_slot"
+                                android:id="@+id/timeSlot"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:ellipsize="end"
                                 android:singleLine="true"
                                 android:text="10 Jan, 8 AM - 11 AM"
                                 android:textColor="@color/black"
-                                android:textSize="13sp"
+                                android:textSize="11sp"
                                 android:textStyle="bold" />
 
                             <ImageView
@@ -197,39 +206,6 @@
                         android:contentDescription="Camera Search"
                         app:tint="@color/black" />
                 </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/nav_home"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackgroundBorderless">
-
-                    <ImageView
-                        android:id="@+id/btn_wallet"
-                        android:layout_width="26dp"
-                        android:layout_gravity="center"
-                        android:layout_height="26dp"
-                        android:src="@drawable/wallet"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:contentDescription="Wallet"
-                        app:tint="@color/white" />
-                    <TextView
-                        android:id="@+id/wallet"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₹500"
-                        android:maxLines="1"
-                        android:textStyle="bold"
-                        android:textSize="11sp"
-                        android:textColor="@color/buy_now_green" />
-                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -253,7 +229,7 @@
                 android:id="@+id/shimmer_ct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="4dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

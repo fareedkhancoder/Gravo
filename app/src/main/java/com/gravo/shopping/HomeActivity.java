@@ -4,11 +4,13 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
 
     private long backPressedTime;
     private Toast backToast;
+    private View rootView;
 
     // Define colors for Active (Blue) and Inactive (Grey)
     private final int COLOR_ACTIVE = Color.parseColor("#2874F0");
@@ -53,6 +56,7 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        rootView = findViewById(R.id.main);
 
         // 1. Bind Views
         initNavViews();
@@ -161,15 +165,19 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
 
         // 2. Set SELECTED to Active (Blue)
         if (selectedId == R.id.nav_home) {
+            rootView.setBackgroundResource(R.drawable.background2);
             imgHome.setColorFilter(COLOR_ACTIVE);
             txtHome.setTextColor(COLOR_ACTIVE);
         } else if (selectedId == R.id.nav_categories) {
+            rootView.setBackgroundResource(R.drawable.background2);
             imgCat.setColorFilter(COLOR_ACTIVE);
             txtCat.setTextColor(COLOR_ACTIVE);
         } else if (selectedId == R.id.nav_account) {
             imgAccount.setColorFilter(COLOR_ACTIVE);
             txtAccount.setTextColor(COLOR_ACTIVE);
+            rootView.setBackgroundResource(R.drawable.bg_toolbar_white_with_line);
         } else if (selectedId == R.id.nav_cart) {
+            rootView.setBackgroundColor(Color.WHITE);
             imgCart.setColorFilter(COLOR_ACTIVE);
             txtCart.setTextColor(COLOR_ACTIVE);
         }
@@ -208,5 +216,13 @@ public class HomeActivity extends AppCompatActivity implements HomeFragment.OnHo
 
         // 3. ✨ Manually update the Custom Nav Bar to look like "Categories" is selected
         updateNavUI(R.id.nav_categories);
+    }
+    @Override
+    public void navigateToCart() {
+
+        if (currentTabId == R.id.nav_cart) return;
+        vibrator(30);
+        replaceFragment(new CartFragment());
+        updateNavUI(R.id.nav_cart);
     }
 }

@@ -13,29 +13,11 @@
     app:strokeColor="#E0E0E0">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="16dp"
         android:paddingBottom="8dp">
-
-        <!-- RadioButton is now vertically centered -->
-        <RadioButton
-            android:id="@+id/selectionRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:clickable="false"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <!-- Guideline for consistent indentation -->
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_begin="40dp" />
 
         <TextView
             android:id="@+id/addressTypeTextView"
@@ -63,7 +45,7 @@
             android:textAppearance="?attr/textAppearanceLabelSmall"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="@id/constraintLayout"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Default" />
 
@@ -77,7 +59,7 @@
             android:textStyle="bold"
             android:paddingHorizontal="15dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="@id/constraintLayout"
             app:layout_constraintTop_toBottomOf="@id/addressTypeTextView"
             tools:text="Rohan Kumar" />
 
@@ -92,7 +74,7 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="@id/constraintLayout"
             app:layout_constraintTop_toBottomOf="@id/userNameAddressTextView"
             tools:text="123, Civil Lines, Meerut, Uttar Pradesh - 250001" />
 
@@ -107,7 +89,7 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?android:attr/textColorSecondary"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="@id/constraintLayout"
             app:layout_constraintTop_toBottomOf="@id/fullAddressTextView"
             tools:text="Phone: 9876543210" />
 

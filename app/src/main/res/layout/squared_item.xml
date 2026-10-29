@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="6dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="#F5F5F5">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Forces perfect square -->
+            <View
+                android:id="@+id/ratio"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/productImageView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerInside"
+                android:padding="18dp"
+                android:src="@drawable/photo_placeholder"
+                app:layout_constraintTop_toTopOf="@id/ratio"
+                app:layout_constraintBottom_toBottomOf="@id/ratio"
+                app:layout_constraintStart_toStartOf="@id/ratio"
+                app:layout_constraintEnd_toEndOf="@id/ratio"
+                android:contentDescription="Category Image" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Title (uses productName so your adapter works) -->
+    <TextView
+        android:id="@+id/productName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Laptops"
+        android:maxLines="1"
+        android:textColor="#1A1A1A"
+        android:textSize="10sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <!-- Hidden views so ProductAdapter doesn't crash -->
+    <TextView android:id="@+id/productBrand" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <TextView android:id="@+id/productPrice" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <TextView android:id="@+id/productMRP" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <TextView android:id="@+id/productDiscount" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+    <TextView android:id="@+id/productRating" android:visibility="gone" android:layout_width="0dp" android:layout_height="0dp"/>
+
+</LinearLayout>

@@ -39,17 +39,19 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
         Banner banner = bannerList.get(actualPosition);
         Context context = holder.itemView.getContext();
 
-        if (banner.getImage() != null && !banner.getImage().isEmpty()) {
+        // FIX: 'banner.getImage()' ki jagah 'banner.getImageUrl()' call karein
+        if (banner != null && banner.getImageUrl() != null && !banner.getImageUrl().trim().isEmpty()) {
             Glide.with(context)
-                    .load(banner.getImage())
+                    .load(banner.getImageUrl())
+                    .centerCrop()
                     .into(holder.bannerImageView);
         } else {
-            // Make sure you have a placeholder drawable, or remove this else block
+            // Fallback image if URL is missing
             holder.bannerImageView.setImageResource(R.drawable.ic_launcher_background);
         }
     }
 
-    // --- NEW METHOD: Allows HomeFragment to update banners without recreating the adapter ---
+    // Allows HomeFragment to update banners without recreating the adapter
     public void updateList(List<Banner> newBanners) {
         this.bannerList = newBanners;
         notifyDataSetChanged();

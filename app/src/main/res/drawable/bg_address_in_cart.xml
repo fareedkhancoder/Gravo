@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Almost solid white with a little transparency so it sits nicely on the blue gradient -->
+    <solid android:color="#f2f2f2" />
+
+    <!-- Soft rounded corners like in the image -->
+    <corners android:radius="6dp" />
+
+    <!-- Optional very light border for better definition -->
+
+</shape>

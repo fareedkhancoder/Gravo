@@ -11,6 +11,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.gravo.shopping.data.repository.ProductRepository;
+import com.gravo.shopping.MyApplication;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,6 +35,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private ProductRepository productRepository;
 
     // Data
     private ArrayList<CartItem> summaryItems;
@@ -37,6 +43,8 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private Address selectedAddress;
     private double mrp = 0.0, discount = 0.0, deliveryFee = 40.0, totalPayable = 0.0;
     private boolean isFromCart = false;
+    private boolean isInstantDelivery = true;
+    private Double configuredDeliveryCharge;
 
     // UI Elements
     private TextView userNameAddress, fullAddress, mrpTextView, discountTextView, deliveryFeeTextView, totalAmountTextView, finalAmountTextView;
@@ -52,6 +60,13 @@ public class OrderSummaryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_summary);
 
+        // Handle window insets
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+
         Toolbar toolbar = findViewById(R.id.toolbarOrderSummary);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -59,6 +74,14 @@ public class OrderSummaryActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        productRepository = MyApplication.getProductRepository();
+        if (getIntent().hasExtra("SELECTED_ADDRESS")) {
+            selectedAddress = (Address) getIntent().getSerializableExtra("SELECTED_ADDRESS");
+        }
+        isInstantDelivery = getIntent().getBooleanExtra("IS_INSTANT_DELIVERY", true);
+        if (getIntent().hasExtra("DELIVERY_CHARGE")) {
+            configuredDeliveryCharge = getIntent().getDoubleExtra("DELIVERY_CHARGE", 0.0);
+        }
 
         // Initialize Views
         userNameAddress = findViewById(R.id.userNameAddress);
@@ -70,6 +93,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
         finalAmountTextView = findViewById(R.id.finalAmountTextView);
         continueButton = findViewById(R.id.continueButton);
         changeAddressButton = findViewById(R.id.changeAddressButton);
+        continueButton.setEnabled(false);
 
         // Setup RecyclerView for order items
         summaryItems = new ArrayList<>();
@@ -98,6 +122,7 @@ public class OrderSummaryActivity extends AppCompatActivity {
                                 if (addr.getAddressId().equals(selectedAddressId)) {
                                     selectedAddress = addr;
                                     updateAddressUI();
+                                    loadDeliveryChargeForSelectedAddress();
                                     break;
                                 }
                             }
@@ -125,6 +150,9 @@ public class OrderSummaryActivity extends AppCompatActivity {
         intent.putExtra("SUMMARY_ITEMS", summaryItems);
         intent.putExtra("TOTAL_PAYABLE", totalPayable);
         intent.putExtra("IS_FROM_CART", isFromCart);
+        if (getIntent().hasExtra("PAYMENT_METHOD")) {
+            intent.putExtra("PAYMENT_METHOD", getIntent().getStringExtra("PAYMENT_METHOD"));
+        }
         startActivity(intent);
     }
 
@@ -176,22 +204,61 @@ public class OrderSummaryActivity extends AppCompatActivity {
                         }
                     }
                     // Select the default address if available, otherwise the first one
-                    selectedAddress = (defaultAddress != null) ? defaultAddress : (userAddressList.isEmpty() ? null : userAddressList.get(0));
+                    if (selectedAddress == null) {
+                        selectedAddress = (defaultAddress != null) ? defaultAddress
+                                : (userAddressList.isEmpty() ? null : userAddressList.get(0));
+                    }
                     updateAddressUI();
+                    loadDeliveryChargeForSelectedAddress();
+                });
+    }
+
+    private void loadDeliveryChargeForSelectedAddress() {
+        if (selectedAddress == null || selectedAddress.getPincode() == null
+                || selectedAddress.getPincode().trim().isEmpty()) {
+            configuredDeliveryCharge = null;
+            continueButton.setEnabled(false);
+            return;
+        }
+
+        productRepository.getDeliveryCharge(selectedAddress.getPincode(),
+                new ProductRepository.DeliveryChargeCallback() {
+                    @Override
+                    public void onSuccess(DeliveryCharge charge) {
+                        if (!charge.isServiceable() || !charge.hasChargeFor(isInstantDelivery)) {
+                            configuredDeliveryCharge = null;
+                            continueButton.setEnabled(false);
+                            Toast.makeText(OrderSummaryActivity.this,
+                                    "Delivery is unavailable for the selected address.",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        configuredDeliveryCharge = isInstantDelivery
+                                ? charge.getInstantCharge()
+                                : charge.getNormalCharge();
+                        continueButton.setEnabled(true);
+                        calculateAndDisplayPriceDetails();
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        configuredDeliveryCharge = null;
+                        continueButton.setEnabled(false);
+                        Toast.makeText(OrderSummaryActivity.this,
+                                "Unable to load delivery charges.", Toast.LENGTH_SHORT).show();
+                    }
                 });
     }
 
     private void fetchProductDetails(String productId) {
-        db.collection("products").document(productId).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        Product product = doc.toObject(Product.class);
-                        if (product != null) {
-                            product.setProductId(doc.getId());
+        productRepository.getProduct(productId, new ProductRepository.ProductCallback() {
+                    @Override public void onSuccess(Product product) {
                             summaryItems.add(new CartItem(product, 1));
                             calculateAndDisplayPriceDetails();
                             checkoutAdapter.notifyDataSetChanged();
-                        }
+                    }
+                    @Override public void onFailure(Exception error) {
+                        Toast.makeText(OrderSummaryActivity.this, "Product unavailable", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -199,25 +266,26 @@ public class OrderSummaryActivity extends AppCompatActivity {
     private void fetchCartDetails(String userId, List<String> productIds) {
         if (productIds == null || productIds.isEmpty()) return;
 
-        db.collection("users").document(userId).collection("cart").whereIn(com.google.firebase.firestore.FieldPath.documentId(), productIds)
-                .get()
+        db.collection("users").document(userId).collection("cart").document("cart").get()
                 .addOnSuccessListener(cartSnapshots -> {
                     Map<String, Integer> quantityMap = new HashMap<>();
-                    for (QueryDocumentSnapshot cartDoc : cartSnapshots) {
-                        Long quantity = cartDoc.getLong("quantity");
-                        if (quantity != null) {
-                            quantityMap.put(cartDoc.getId(), quantity.intValue());
+                    List<Map<String, Object>> cartProducts = (List<Map<String, Object>>) cartSnapshots.get("products");
+                    if (cartProducts != null) {
+                        for (Map<String, Object> cartProduct : cartProducts) {
+                            String productId = cartProduct.get("productId") instanceof String
+                                    ? (String) cartProduct.get("productId") : null;
+                            Object rawQuantity = cartProduct.get("quantity");
+                            if (productId != null && rawQuantity instanceof Number
+                                    && productIds.contains(productId)) {
+                                quantityMap.put(productId, ((Number) rawQuantity).intValue());
+                            }
                         }
                     }
 
-                    db.collection("products").whereIn(com.google.firebase.firestore.FieldPath.documentId(), productIds)
-                            .get()
-                            .addOnSuccessListener(productSnapshots -> {
+                    productRepository.getProducts(productIds, products -> {
                                 summaryItems.clear();
-                                for (QueryDocumentSnapshot productDoc : productSnapshots) {
-                                    Product product = productDoc.toObject(Product.class);
-                                    product.setProductId(productDoc.getId());
-                                    int quantity = quantityMap.getOrDefault(productDoc.getId(), 1);
+                                for (Product product : products) {
+                                    int quantity = quantityMap.getOrDefault(product.getProductId(), 1);
                                     summaryItems.add(new CartItem(product, quantity));
                                 }
                                 calculateAndDisplayPriceDetails();
@@ -232,12 +300,15 @@ public class OrderSummaryActivity extends AppCompatActivity {
             mrp += item.getProduct().getPrice() * item.getQuantity();
         }
         discount = mrp * 0.10; // Example: 10% discount
-        deliveryFee = (mrp - discount > 500) ? 0.0 : 40.0; // Example: Free delivery on orders over 500
+        boolean hasConfiguredCharge = configuredDeliveryCharge != null;
+        deliveryFee = hasConfiguredCharge ? configuredDeliveryCharge : 0.0;
         totalPayable = mrp - discount + deliveryFee;
 
         mrpTextView.setText(String.format("₹%.2f", mrp));
         discountTextView.setText(String.format("- ₹%.2f", discount));
-        deliveryFeeTextView.setText(deliveryFee == 0.0 ? "FREE" : String.format("₹%.2f", deliveryFee));
+        deliveryFeeTextView.setText(hasConfiguredCharge
+                ? (deliveryFee == 0.0 ? "FREE" : String.format("₹%.2f", deliveryFee))
+                : "—");
         totalAmountTextView.setText(String.format("₹%.2f", totalPayable));
         finalAmountTextView.setText(String.format("₹%.2f", totalPayable));
     }

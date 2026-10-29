@@ -1,20 +1,24 @@
 package com.gravo.shopping;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductViewHolder> {
 
@@ -24,83 +28,135 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private final Context context;
     private final List<Product> productList;
-    private final OnProductClickListener clickListener;
     private final int layoutId;
+    private final OnProductClickListener clickListener;
 
-    public ProductAdapter(Context context, List<Product> productList, int layoutId, OnProductClickListener clickListener) {
+    private final DecimalFormat priceFormatter = new DecimalFormat("0.00");
+    private final RequestOptions imageOptions = new RequestOptions()
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .placeholder(R.drawable.placeholder)
+            .error(R.drawable.placeholder)
+            .dontAnimate()
+            .override(400, 400);
+
+    public ProductAdapter(@NonNull Context context, List<Product> productList, int layoutId, OnProductClickListener clickListener) {
         this.context = context;
-        this.productList = productList;
+        this.productList = productList != null ? productList : new ArrayList<>();
         this.layoutId = layoutId;
         this.clickListener = clickListener;
     }
 
-
-
     @NonNull
     @Override
     public ProductViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
         return new ProductViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = productList.get(position);
-        holder.productNameTextView.setText(product.getName());
-        holder.productPriceTextView.setText("₹" + String.format("%.2f", product.getPrice()));
+        if (product == null) return;
 
-        if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
-            Glide.with(context)
-                    .load(product.getImageUrls().get(0))
-                    .into(holder.productImageView);
+        // 1. BRAND (Crash fix: Null check added because item_product.xml lacks this view)
+        if (holder.productBrand != null) {
+            String brand = product.getBrand();
+            holder.productBrand.setText(brand != null ? brand : "");
         }
 
-        // --- CORE LOGIC TO MANAGE BUTTON VISIBILITY ---
-        if (product.getQuantityInCart() == 0) {
-            // Show "Add" button, hide quantity selector
-            holder.addButton.setVisibility(View.VISIBLE);
-            holder.quantitySelector.setVisibility(View.GONE);
-        } else {
-            // Hide "Add" button, show quantity selector
-            holder.addButton.setVisibility(View.GONE);
-            holder.quantitySelector.setVisibility(View.VISIBLE);
-            holder.quantityTextView.setText(String.valueOf(product.getQuantityInCart()));
+        // 2. PRODUCT NAME
+        if (holder.productName != null) {
+            String name = product.getName();
+            holder.productName.setText(name != null ? name : "");
+        }
+        // 3. PRICES & DISCOUNT
+        if (holder.productPrice != null && holder.productMRP != null && holder.productDiscount != null) {
+
+            // Since cost price is AFTER discount, it acts as our final selling price
+            double finalSellingPrice = sanitizePrice(product.getPrice());
+            double discountPercent = product.getDiscountPercent();
+
+            // Show the final selling price
+            holder.productPrice.setText(formatPrice(finalSellingPrice));
+
+            // Calculate the original MRP before the discount was applied
+            // Formula: MRP = Final Price / (1 - (Discount% / 100))
+            double mrp = finalSellingPrice;
+            if (discountPercent > 0 && discountPercent < 100) {
+                mrp = finalSellingPrice / (1.0 - (discountPercent / 100.0));
+            }
+
+            if (discountPercent > 0 && finalSellingPrice >= 0) {
+                holder.productMRP.setVisibility(View.VISIBLE);
+                holder.productDiscount.setVisibility(View.VISIBLE);
+
+                holder.productMRP.setText(formatPrice(mrp));
+                holder.productMRP.setPaintFlags(holder.productMRP.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+
+                holder.productDiscount.setText(String.format(Locale.getDefault(), "%.0f%% off", discountPercent));
+            } else {
+                holder.productMRP.setVisibility(View.GONE);
+                holder.productDiscount.setVisibility(View.GONE);
+                holder.productMRP.setText("");
+                holder.productDiscount.setText("");
+            }
         }
 
-        // --- CLICK LISTENERS ---
+        // 4. RATING (Placeholder fix for the orphaned view)
+        if (holder.productRating != null) {
+            holder.productRating.setText("★ 4.5"); // Hardcoded until you add a 'rating' field to Product.java
+        }
+
+        // 5. IMAGE
+        if (holder.productImageView != null) {
+            loadImage(holder.productImageView, product);
+        }
+
+        // 6. CLICK LISTENER
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) {
                 clickListener.onProductClick(product);
             }
         });
-
-        holder.addButton.setOnClickListener(v -> {
-            product.setQuantityInCart(1);
-            notifyItemChanged(holder.getAdapterPosition()); // Refresh this item to show the stepper
-        });
-
-        holder.plusButton.setOnClickListener(v -> {
-            int currentQuantity = product.getQuantityInCart();
-            product.setQuantityInCart(currentQuantity + 1);
-            holder.quantityTextView.setText(String.valueOf(product.getQuantityInCart()));
-        });
-
-        holder.minusButton.setOnClickListener(v -> {
-            int currentQuantity = product.getQuantityInCart();
-            if (currentQuantity > 0) {
-                product.setQuantityInCart(currentQuantity - 1);
-                // If quantity becomes 0, refresh the item to show the "Add" button again
-                if (product.getQuantityInCart() == 0) {
-                    notifyItemChanged(holder.getAdapterPosition());
-                } else {
-                    holder.quantityTextView.setText(String.valueOf(product.getQuantityInCart()));
-                }
-            }
-        });
     }
+
+    private void loadImage(@NonNull ImageView imageView, @NonNull Product product) {
+        String imageUrl = null;
+        List<String> imageUrls = product.getImageUrls();
+
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            imageUrl = imageUrls.get(0);
+        }
+
+        Glide.with(imageView).clear(imageView);
+
+        if (imageUrl == null || imageUrl.trim().isEmpty()) {
+            imageView.setImageResource(R.drawable.placeholder);
+            return;
+        }
+
+        Glide.with(imageView)
+                .load(imageUrl)
+                .apply(imageOptions)
+                .thumbnail(0.25f)
+                .into(imageView);
+    }
+
+    private double sanitizePrice(double value) {
+        if (Double.isNaN(value) || Double.isInfinite(value) || value < 0) return 0.0;
+        return value;
+    }
+
+    private String formatPrice(double price) {
+        long roundedPrice = Math.round(price);
+        return "₹" + roundedPrice;
+    }
+
     public void updateList(List<Product> newList) {
-        this.productList.clear();
-        this.productList.addAll(newList);
+        productList.clear();
+        if (newList != null) {
+            productList.addAll(newList);
+        }
         notifyDataSetChanged();
     }
 
@@ -109,34 +165,32 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
         return productList.size();
     }
 
-    public static class ProductViewHolder extends RecyclerView.ViewHolder {
-        // Existing views
-        ImageView productImageView;
-        TextView productNameTextView;
-        TextView productPriceTextView;
+    @Override
+    public void onViewRecycled(@NonNull ProductViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder.productImageView != null) {
+            Glide.with(holder.productImageView).clear(holder.productImageView);
+        }
+    }
 
-        // New views for the add/quantity button
-        TextView addButton;
-        LinearLayout quantitySelector;
-        ImageButton minusButton;
-        TextView quantityTextView;
-        ImageButton plusButton;
+    public static class ProductViewHolder extends RecyclerView.ViewHolder {
+        final ImageView productImageView;
+        final TextView productBrand;
+        final TextView productName;
+        final TextView productPrice;
+        final TextView productMRP;
+        final TextView productDiscount;
+        final TextView productRating; // Added reference
 
         public ProductViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Existing
             productImageView = itemView.findViewById(R.id.productImageView);
-            productNameTextView = itemView.findViewById(R.id.productNameTextView);
-            productPriceTextView = itemView.findViewById(R.id.productPriceTextView);
-
-            // New views from the layout
-            addButton = itemView.findViewById(R.id.addButton);
-            quantitySelector = itemView.findViewById(R.id.quantitySelector);
-            minusButton = itemView.findViewById(R.id.minusButton);
-            quantityTextView = itemView.findViewById(R.id.quantityTextView);
-            plusButton = itemView.findViewById(R.id.PlusBtn);
+            productBrand = itemView.findViewById(R.id.productBrand); // Will be null for item_product.xml
+            productName = itemView.findViewById(R.id.productName);
+            productPrice = itemView.findViewById(R.id.productPrice);
+            productMRP = itemView.findViewById(R.id.productMRP);
+            productDiscount = itemView.findViewById(R.id.productDiscount);
+            productRating = itemView.findViewById(R.id.productRating); // Will map to XML rating
         }
-
-
     }
 }

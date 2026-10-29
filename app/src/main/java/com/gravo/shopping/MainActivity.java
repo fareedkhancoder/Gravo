@@ -43,8 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     // UI Components (Simple Variables)
     private MaterialButton btnGoogleLogin;
-    private MaterialButton btnSkip;
-    private TextView btnPhoneLogin; // XML mein ye TextView tha
+    private TextView btnPhoneLogin;
 
     // Google Sign In
     private SignInClient oneTapClient;
@@ -63,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 1. Initialize Views with findViewById
         btnGoogleLogin = findViewById(R.id.btnGoogleLogin);
-        btnSkip = findViewById(R.id.btnSkip);
-        btnPhoneLogin = findViewById(R.id.loginButton); // XML ID match karein
+        btnPhoneLogin = findViewById(R.id.loginButton);
 
         // 2. Setup ViewModel
         viewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -89,11 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 2. Phone Login
         btnPhoneLogin.setOnClickListener(v -> showPhoneInputDialog());
-
-        // 3. Skip Login
-        btnSkip.setOnClickListener(v -> {
-            navigateToHomeActivity();
-        });
     }
 
     private void setupObservers() {

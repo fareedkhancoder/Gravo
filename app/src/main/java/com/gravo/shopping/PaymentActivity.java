@@ -53,6 +53,7 @@ public class PaymentActivity extends AppCompatActivity {
         summaryItems = (ArrayList<CartItem>) intent.getSerializableExtra("SUMMARY_ITEMS");
         totalPayable = intent.getDoubleExtra("TOTAL_PAYABLE", 0.0);
         isFromCart = intent.getBooleanExtra("IS_FROM_CART", false);
+        String selectedPaymentMethod = intent.getStringExtra("PAYMENT_METHOD");
 
         finalAmountTextView.setText(String.format("₹%.2f", totalPayable));
 
@@ -62,6 +63,11 @@ public class PaymentActivity extends AppCompatActivity {
         findViewById(R.id.netBankingOption).setOnClickListener(v -> showComingSoonToast());
 
         RadioButton codRadio = findViewById(R.id.radioCashOnDelivery);
+        if ("UPI".equals(selectedPaymentMethod)) {
+            Toast.makeText(this, "Online (UPI) selected. UPI payment setup is required to continue.", Toast.LENGTH_LONG).show();
+            codRadio.setChecked(false);
+            placeOrderButton.setEnabled(false);
+        }
         codRadio.setOnCheckedChangeListener((buttonView, isChecked) -> {
             placeOrderButton.setEnabled(isChecked);
         });
@@ -103,9 +109,6 @@ public class PaymentActivity extends AppCompatActivity {
 
         List<Map<String, Object>> orderItemsList = new ArrayList<>();
         for (CartItem item : summaryItems) {
-            DocumentReference productRef = db.collection("products").document(item.getProduct().getProductId());
-            batch.update(productRef, "stockQuantity", FieldValue.increment(-item.getQuantity()));
-
             Map<String, Object> orderItemMap = new HashMap<>();
             orderItemMap.put("productName", item.getProduct().getName());
             // --- KEY ADDITION: Save Name here so it shows in your Dashboard immediately ---
@@ -124,11 +127,12 @@ public class PaymentActivity extends AppCompatActivity {
         orderData.put("items", orderItemsList);
         batch.set(orderRef, orderData);
         if (isFromCart) {
-            for (CartItem item : summaryItems) {
-                DocumentReference cartItemRef = db.collection("users").document(userId)
-                        .collection("cart").document(item.getProduct().getProductId());
-                batch.delete(cartItemRef);
-            }
+            DocumentReference cartSummaryRef = db.collection("users").document(userId)
+                    .collection("cart").document("cart");
+            Map<String, Object> emptyCart = new HashMap<>();
+            emptyCart.put("products", new ArrayList<>());
+            emptyCart.put("updatedAt", System.currentTimeMillis());
+            batch.set(cartSummaryRef, emptyCart, com.google.firebase.firestore.SetOptions.merge());
         }
 
         batch.commit().addOnSuccessListener(aVoid -> {

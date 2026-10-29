@@ -35,6 +35,7 @@ android {
 
 dependencies {
 
+    implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.credentials)
@@ -44,6 +45,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.media3.ui)
     implementation(libs.media3.exoplayer)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -66,5 +68,14 @@ dependencies {
 
     implementation("com.airbnb.android:lottie:5.2.0") // Use the latest version
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+    implementation("com.google.firebase:firebase-functions")
+
+    implementation("androidx.room:room-runtime:2.8.3")
+    annotationProcessor("androidx.room:room-compiler:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime:2.8.7")
+
+    implementation("com.google.android.libraries.places:places:3.5.0")
 
 }

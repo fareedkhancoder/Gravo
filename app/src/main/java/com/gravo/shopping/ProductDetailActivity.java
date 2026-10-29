@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -22,7 +21,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.gravo.shopping.viewmodel.ProductViewModel;
 
 import java.util.Map;
@@ -30,7 +28,6 @@ import java.util.Map;
 public class ProductDetailActivity extends AppCompatActivity {
 
     // Dependencies
-    private FirebaseFirestore db; // Kept only for reading Product Details (Phase 4 Refactor)
     private ProductViewModel viewModel; // MVVM: Handles Cart Logic
 
     // Data
@@ -62,12 +59,13 @@ public class ProductDetailActivity extends AppCompatActivity {
             return insets;
         });
 
-        // 1. Initialize UI & Dependencies
+        // 1. Initialize Views
         initViews();
-        db = FirebaseFirestore.getInstance();
+
+        // 2. Initialize ViewModel PEHLE Karein
         viewModel = new ViewModelProvider(this).get(ProductViewModel.class);
 
-        // 2. Get Product ID
+        // 3. Get Product ID from Intent
         productId = getIntent().getStringExtra("PRODUCT_ID");
         if (productId == null) {
             Toast.makeText(this, "Product not found", Toast.LENGTH_SHORT).show();
@@ -75,22 +73,20 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // 3. MVVM: Start Monitoring Cart Status
-        // This tells the ViewModel to start listening to Firestore for this product
-        viewModel.monitorCartStatus(productId);
+        // 4. Observe Room DB Product Data (Product Render karne ke liye)
+        viewModel.observeProduct(productId).observe(this, this::renderProduct);
 
-        // 4. MVVM: Observe LiveData
+        // 5. Start Monitoring Cart Status & Observe ViewModel LiveData
+        viewModel.monitorCartStatus(productId);
         observeViewModel();
 
-        // 5. Setup UI Logic
+        // 6. Setup UI Logic & Interactions
         setupToolbarFadeEffect();
         setupButtons();
 
-        // 6. Fetch Product Data (Visuals)
-        // Note: Ideally, this read logic should also move to ViewModel in the future
-        fetchProductDetails(productId);
+        // 7. Load Product
+        viewModel.startListeningToProduct(productId);
     }
-
     private void initViews() {
         appBarLayout = findViewById(R.id.appBarLayout);
         toolbarContent = findViewById(R.id.toolbar_content);
@@ -186,17 +182,8 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
     }
 
-    // --- OLD MVC LOGIC (For Reading Data) ---
-    // We kept this here to ensure the page still loads images/specs correctly
-    // while we focus on fixing the Cart Logic first.
-    private void fetchProductDetails(String id) {
-        db.collection("products").document(id)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Product product = documentSnapshot.toObject(Product.class);
-
-                        if (product != null) {
+    private void renderProduct(Product product) {
+        if (product != null) {
                             // 1. Basic Info
                             TextView brandTextView = findViewById(R.id.productBrand);
                             String brand = product.getBrand() != null ? product.getBrand() : "";
@@ -231,18 +218,18 @@ public class ProductDetailActivity extends AppCompatActivity {
                             // 3. Description & Images
                             productDescriptionTextView.setText(product.getDescription());
 
-                            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
-                                ProductImagesAdapter adapter = new ProductImagesAdapter(this, product.getImageUrls());
-                                productImagesViewPager.setAdapter(adapter);
-                                new TabLayoutMediator(viewPagerIndicator, productImagesViewPager, (tab, position) -> {}).attach();
-                            }
+            if (product.getImageUrls() != null && !product.getImageUrls().isEmpty()) {
+                // Agar adapter pehle se set nahi hai, tabhi naya adapter aur mediator lagayein
+                if (productImagesViewPager.getAdapter() == null) {
+                    ProductImagesAdapter adapter = new ProductImagesAdapter(this, product.getImageUrls());
+                    productImagesViewPager.setAdapter(adapter);
+                    new TabLayoutMediator(viewPagerIndicator, productImagesViewPager, (tab, position) -> {}).attach();
+                }
+            }
 
-                            // 4. Dynamic Specifications
-                            displaySpecifications(product);
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> Log.e(TAG, "Error fetching product", e));
+            // 4. Dynamic Specifications
+            displaySpecifications(product);
+        }
     }
 
     private void displaySpecifications(Product product) {
