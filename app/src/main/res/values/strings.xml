@@ -12,6 +12,15 @@
     <string name="type_of_address">Type of address</string>
     <string name="home">Home</string>
     <string name="work">Work</string>
+    <string name="welcome_tagline">Your Everyday Shopping App</string>
+    <string name="welcome_grocery_image_description">A Gravo shopping bag filled with fresh groceries and household essentials</string>
+    <string name="benefit_home_delivery">Home\nDelivery</string>
+    <string name="benefit_best_prices">Best\nPrices</string>
+    <string name="benefit_wide_selection">Wide\nSelection</string>
+    <string name="continue_with_phone">Continue with Phone Number</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="new_to_gravo">New to Gravo?</string>
+    <string name="create_account">Create an Account</string>
     <string name="make_this_my_default_address">Make this my default address</string>
     <string name="save_address">Save Address</string>
     <string name="price_format_from">From ₹%.0f</string>
@@ -49,7 +58,7 @@
     <string name="gravo_cart_normal_subtitle">Choose a delivery slot</string>
     <string name="gravo_cart_instant_delivery_content_description">Choose instant delivery</string>
     <string name="gravo_cart_normal_delivery_content_description">Choose normal delivery</string>
-    <string name="gravo_cart_free_delivery_default">Free delivery eligibility is checked for your address</string>
+    <string name="gravo_cart_free_delivery_default">Your cart is not eligible for free delivery yet. Add approx $2345 more to unlock Free delivery </string>
     <string name="gravo_cart_free_delivery_progress_content_description">Progress towards free delivery</string>
     <string name="gravo_cart_coupon_title">Have a coupon?</string>
     <string name="gravo_cart_coupon_subtitle">Apply an offer to this order</string>

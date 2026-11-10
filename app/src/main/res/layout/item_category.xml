@@ -18,7 +18,7 @@
         app:cardCornerRadius="30dp"
         app:cardElevation="0dp"
         app:strokeWidth="1dp"
-        app:strokeColor="#008E0C">
+        app:strokeColor="#FFFFFF">
 
         <ImageView
             android:id="@+id/categoryImageView"

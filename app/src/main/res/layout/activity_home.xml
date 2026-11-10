@@ -138,4 +138,6 @@
 
     </LinearLayout>
 
+    <include layout="@layout/view_startup_loading" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

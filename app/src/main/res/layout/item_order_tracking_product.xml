@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:minHeight="104dp"
+    android:paddingStart="4dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="10dp">
+
+    <ImageView
+        android:id="@+id/ivProductImage"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:background="@drawable/bg_order_product_image"
+        android:contentDescription="Product image"
+        android:padding="5dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_delivery" />
+
+    <TextView
+        android:id="@+id/tvProductName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="2"
+        android:textColor="#20242A"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ivProductImage"
+        app:layout_constraintTop_toTopOf="@id/ivProductImage"
+        tools:text="SilkRoot Nourishing Conditioner" />
+
+    <TextView
+        android:id="@+id/tvProductVariant"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#858B95"
+        android:textSize="11sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/tvProductName"
+        app:layout_constraintStart_toStartOf="@id/tvProductName"
+        app:layout_constraintTop_toBottomOf="@id/tvProductName"
+        tools:text="500 ml · Pack of 1"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tvProductQuantity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-medium"
+        android:text="Qty 1"
+        android:textColor="#626A75"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvLineTotal"
+        app:layout_constraintStart_toStartOf="@id/tvProductName"
+        tools:text="Qty 2" />
+
+    <TextView
+        android:id="@+id/tvUnitPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="9dp"
+        android:textColor="#858B95"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@id/tvLineTotal"
+        app:layout_constraintStart_toEndOf="@id/tvProductQuantity"
+        tools:text="₹ 212.00 each" />
+
+    <TextView
+        android:id="@+id/tvLineTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#20242A"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="@id/ivProductImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="₹ 424.00" />
+
+    <View
+        android:id="@+id/productDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="#EEF0F3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/tvProductName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

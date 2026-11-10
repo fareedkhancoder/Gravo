@@ -166,7 +166,7 @@
                     android:textColor="#FFFFFF"
                     android:backgroundTint="#1E88E5"
                     app:cornerRadius="8dp"
-                    app:icon="@drawable/baseline_location_on_24"
+                    app:icon="@drawable/ic_location"
                     app:iconTint="#FFFFFF"
                     app:iconGravity="textStart"
                     app:iconPadding="6dp"
@@ -193,7 +193,7 @@
                     android:layout_gravity="center"
                     android:contentDescription="Selected location"
                     android:elevation="8dp"
-                    android:src="@drawable/baseline_location_on_24" />
+                    android:src="@drawable/ic_location" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btnCurrentLocation"

@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- Internet Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Location permission -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -24,13 +25,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Gravo">
         <activity
+            android:name=".OrderDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".OrderTrackActivity"
             android:exported="false" />
         <activity
             android:name=".OrderConfirmedActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PaymentActivity"
             android:exported="false" />
         <activity
             android:name=".SplashActivity"
@@ -54,9 +55,6 @@
             android:exported="false" />
         <activity
             android:name=".MyOrdersActivity"
-            android:exported="false" />
-        <activity
-            android:name=".OrderSummaryActivity"
             android:exported="false" />
         <activity
             android:name=".ProductDetailActivity"

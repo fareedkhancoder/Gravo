@@ -56,7 +56,7 @@
                         android:id="@+id/img_location_pin"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/baseline_location_on_24"
+                        android:src="@drawable/ic_location"
                         android:contentDescription="Location Pin"
                         app:tint="@color/black" />
 
@@ -90,7 +90,7 @@
                                 android:ellipsize="end"
                                 android:singleLine="true"
                                 android:text="Delivered By: "
-                                android:textColor="@color/dialog_accent_sky_blue"
+                                android:textColor="#006204"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
 
@@ -109,7 +109,7 @@
                                 android:layout_width="18dp"
                                 android:layout_height="18dp"
                                 android:layout_marginStart="2dp"
-                                android:src="@drawable/baseline_arrow_drop_down_24"
+                                android:src="@drawable/ic_down_arrow"
                                 android:contentDescription="Dropdown Arrow"
                                 app:tint="@color/white" />
                         </LinearLayout>
@@ -197,14 +197,6 @@
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textSize="14sp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginStart="12dp"
-                        android:src="@drawable/ic_camera"
-                        android:contentDescription="Camera Search"
-                        app:tint="@color/black" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

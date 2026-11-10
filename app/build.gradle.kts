@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.gravo.shopping"
+    namespace = "com.gravo.Meher"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.gravo.shopping"
+        applicationId = "com.gravo.Meher"
         minSdk = 28
         targetSdk = 36
         versionCode = 1
@@ -77,5 +77,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime:2.8.7")
 
     implementation("com.google.android.libraries.places:places:3.5.0")
+    implementation("com.razorpay:checkout:1.6.41")
 
 }

@@ -39,73 +39,11 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/instantDeliveryOption"
-            android:layout_width="0dp"
-            android:layout_height="45dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="5dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
-            android:contentDescription="@string/gravo_cart_instant_delivery_content_description"
-            app:cardBackgroundColor="@color/gravo_cart_surface"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/gravo_cart_border"
-            app:strokeWidth="1dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="9dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp">
-
-                <ImageView
-                    android:layout_width="21dp"
-                    android:layout_height="21dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_flash"
-                    app:tint="@color/gravo_cart_blue" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/instantDeliveryTitleTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:text="@string/gravo_cart_instant"
-                        android:textColor="@color/gravo_cart_text_primary"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/instantDeliveryRadioIcon"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_marginStart="3dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/ic_radio_check"
-                    app:tint="@color/gravo_cart_muted" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
             android:id="@+id/normalDeliveryOption"
             android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="1"
-            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground"
@@ -161,6 +99,68 @@
                     app:tint="@color/gravo_cart_muted" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/instantDeliveryOption"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:contentDescription="@string/gravo_cart_instant_delivery_content_description"
+            app:cardBackgroundColor="@color/gravo_cart_surface"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/gravo_cart_border"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="9dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp">
+
+                <ImageView
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_flash"
+                    app:tint="@color/gravo_cart_blue" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/instantDeliveryTitleTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:text="@string/gravo_cart_instant"
+                        android:textColor="@color/gravo_cart_text_primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/instantDeliveryRadioIcon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginStart="3dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_radio_check"
+                    app:tint="@color/gravo_cart_muted" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
     <!-- Address appears below delivery mode; toolbar removed. -->
@@ -187,7 +187,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:contentDescription="Location Pin"
-            android:src="@drawable/baseline_location_on_24"
+            android:src="@drawable/ic_location"
             app:tint="@color/black" />
 
         <LinearLayout
@@ -241,7 +241,7 @@
                     android:layout_height="18dp"
                     android:layout_marginStart="2dp"
                     android:contentDescription="Dropdown Arrow"
-                    android:src="@drawable/baseline_arrow_drop_down_24"
+                    android:src="@drawable/ic_down_arrow"
                     app:tint="@color/white" />
             </LinearLayout>
         </LinearLayout>
@@ -273,10 +273,53 @@
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:strokeWidth="0dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/deliveryAvailabilityMessage"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/deliveryAddressCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="10dp">
+
+            <ImageView
+                android:id="@+id/freeDeliveryIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_delivery"
+                app:tint="@color/gravo_cart_blue" />
+
+            <TextView
+                android:id="@+id/freeDeliveryMessageTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:text="Free delivery is available"
+                android:textColor="@color/gravo_cart_blue_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/checkAgainTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:text="Check Again"
+                android:gravity="end"
+                android:textColor="@color/gravo_cart_blue"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -390,19 +433,6 @@
             app:cornerRadius="14dp" />
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/cartLoadingProgress"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:indeterminate="true"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/freeDeliveryCard"
-        app:layout_constraintBottom_toTopOf="@id/summaryCard"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:visibility="gone" />
-
     <!-- Pinned summary: the cart amount remains visible while products scroll. -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/summaryCard"
@@ -493,6 +523,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/gravo_cart_divider" />
 
+
             <!-- Existing ID retained. Current CartFragment writes the cart subtotal here. -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -520,67 +551,12 @@
                     android:textStyle="bold"
                     tools:text="₹1,250.00" />
             </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="19dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/deliveryFeeLabelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/gravo_cart_delivery_fee"
-                    android:textColor="@color/gravo_cart_text_secondary"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/deliveryFee"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/gravo_cart_amount_pending"
-                    android:textColor="@color/gravo_cart_text_primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    tools:text="₹10.00" />
-            </LinearLayout>
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="3dp"
                 android:layout_marginBottom="4dp"
                 android:background="@color/gravo_cart_divider" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:minHeight="25dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/grandTotalLabelTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/gravo_cart_estimated_total"
-                    android:textColor="@color/gravo_cart_text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/estimatedTotalTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/gravo_cart_amount_pending"
-                    android:textColor="@color/gravo_cart_blue_dark"
-                    android:textSize="17sp"
-                    android:textStyle="bold"
-                    tools:text="₹1,240.00" />
-            </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
@@ -590,24 +566,100 @@
                 android:textColor="@color/gravo_cart_text_secondary"
                 android:textSize="10sp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/placeOrderButton"
+            <LinearLayout
+                android:id="@+id/checkoutActionContainer"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
-                android:contentDescription="@string/gravo_cart_continue_checkout_content_description"
-                android:text="@string/gravo_cart_continue_checkout"
-                android:textAllCaps="false"
-                android:textColor="@color/gravo_cart_on_blue"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/gravo_cart_blue"
-                app:cornerRadius="15dp"
-                app:icon="@drawable/outline_arrow_forward_24"
-                app:iconGravity="textEnd"
-                app:iconPadding="8dp"
-                app:iconTint="@color/gravo_cart_on_blue" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/selectedPaymentDisplayContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_add_pill"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="8dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/selectedPaymentIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/wallet" />
+
+                    <TextView
+                        android:id="@+id/selectedPaymentTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:text="COD"
+                        android:textColor="@color/gravo_cart_text_primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/placeOrderButton"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/gravo_cart_continue_checkout_content_description"
+                    android:text="@string/gravo_cart_continue_checkout"
+                    android:textAllCaps="false"
+                    android:textColor="@color/gravo_cart_on_blue"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="@color/gravo_cart_blue"
+                    app:cornerRadius="15dp"
+                    app:icon="@drawable/outline_arrow_forward_24"
+                    app:iconGravity="textEnd"
+                    app:iconPadding="6dp"
+                    app:iconTint="@color/gravo_cart_on_blue" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/cartLoadingOverlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/gravo_cart_background"
+        android:clickable="true"
+        android:elevation="30dp"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ProgressBar
+            android:id="@+id/cartLoadingProgress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminate="true"
+            android:indeterminateTint="@color/gravo_cart_blue" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Loading your cart..."
+            android:textColor="@color/gravo_cart_text_primary"
+            android:textSize="14sp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
